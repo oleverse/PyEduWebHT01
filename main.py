@@ -35,6 +35,16 @@ def sanitize_phone_number(phone):
 
     return new_phone
 
+def isValid(email):
+
+    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+
+    if re.fullmatch(regex, email):
+        return email
+    else:
+        print("Invalid email")
+        return None
+
 
 def input_error(handler):
     """Errors handler"""
@@ -98,10 +108,11 @@ def add_handler(data):
             birthday = Birthday(data[2])
         if len(data) == 4:
             birthday = Birthday(data[2])
-            email = Email(data[3])
+            email = Email(isValid(data[3]))
         if len(data) == 5:
             birthday = Birthday(data[2])
-            email = Email(data[3])
+            email = Email(isValid(data[3]))
+
             address_home = AddressHome(data[4])
 
     if CONTACTS.add_record(Record(name, phone, birthday, email, address_home)):

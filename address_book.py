@@ -96,8 +96,13 @@ class Birthday(Field):
             self._value = None
 
 class Email(Field):
+
+
+
     def __init__(self, value: str) -> None:
         self.value = value
+
+
 
 class AddressHome(Field):
     def __init__(self, value: str) -> None:
