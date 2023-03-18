@@ -2,7 +2,7 @@ import re
 from address_book import *
 
 GOOD_BYE_MSG = "Good bye!"
-COMMAND_ARGS_MAX_COUNT = 3
+COMMAND_ARGS_MAX_COUNT = 5
 INDEX_NOT_FOUND = -1
 
 CONTACTS = AddressBook()
@@ -89,13 +89,22 @@ def add_handler(data):
     name = Name(data[0])
     phone = None
     birthday = None
+    email = None
+    address_home = None
 
     if len(data) > 1:
         phone = Phone(sanitize_phone_number(data[1]))
         if len(data) == 3:
             birthday = Birthday(data[2])
+        if len(data) == 4:
+            birthday = Birthday(data[2])
+            email = Email(data[3])
+        if len(data) == 5:
+            birthday = Birthday(data[2])
+            email = Email(data[3])
+            address_home = AddressHome(data[4])
 
-    if CONTACTS.add_record(Record(name, phone, birthday)):
+    if CONTACTS.add_record(Record(name, phone, birthday, email, address_home)):
         return "Contact successfully added."
     else:
         return 'The record exists or an error occured. Try "change" command.'
@@ -237,7 +246,7 @@ COMMANDS = {
     },
     "add": {
         "handler": add_handler,
-        "args_count": 3,
+        "args_count": 5,
         "description": "adds a contact to the address book"
     },
     "delete": {

@@ -95,13 +95,22 @@ class Birthday(Field):
             print('Bad date format, should be "%Y-%m-%d" like "2000-01-01"')
             self._value = None
 
+class Email(Field):
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+class AddressHome(Field):
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 class Record:
     def __init__(self, name: Name, phone: Phone|None = None, 
-                 birthday: Birthday|None = None) -> None:
+                 birthday: Birthday|None = None, email: Email|None = None, address_home: AddressHome|None = None) -> None:
         self.name = name
         self.phones = []
         self.birthday = birthday
+        self.email = email
+        #self.address_home = address_home
 
         if phone and phone.value:
             self.add_phone(phone)
@@ -116,6 +125,14 @@ class Record:
         if self.phones:
             result += "\tphones: "
             result += f"{', '.join([p.value for p in self.phones])}\n"
+
+        if self.email:
+            result += "\temail: "
+            result += f" {self.email.value}\n"
+
+        #if self.address_home:
+        #    result += "\taddress: "
+        #    result += f" {self.address_home.value}\n"
 
         return result
     
