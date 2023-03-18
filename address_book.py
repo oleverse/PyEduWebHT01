@@ -110,7 +110,7 @@ class Record:
         self.phones = []
         self.birthday = birthday
         self.email = email
-        #self.address_home = address_home
+        self.address_home = address_home
 
         if phone and phone.value:
             self.add_phone(phone)
@@ -130,9 +130,9 @@ class Record:
             result += "\temail: "
             result += f" {self.email.value}\n"
 
-        #if self.address_home:
-        #    result += "\taddress: "
-        #    result += f" {self.address_home.value}\n"
+        if self.address_home:
+            result += "\taddress: "
+            result += f" {self.address_home.value}\n"
 
         return result
     

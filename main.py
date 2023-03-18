@@ -41,7 +41,7 @@ def input_error(handler):
 
     def decorate_handler(data=None):
         warning = ""
-        if handler.__name__  == "call_handler" and data is not None:
+        if handler.__name__ == "call_handler" and data is not None:
             command = data[0]
             
             if data[1]:
@@ -52,10 +52,10 @@ def input_error(handler):
         try:
             return f"{warning}{handler(data)}"
         except KeyError:
-            if handler.__name__  == "call_handler":
+            if handler.__name__ == "call_handler":
                 return "Unknown command."
         except ValueError:
-            if handler.__name__  == "call_handler":
+            if handler.__name__ == "call_handler":
                 return "Too many arguments."
         except IndexError:
             if handler.__name__ in(
