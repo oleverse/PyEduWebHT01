@@ -3,36 +3,41 @@ import pickle
 
 
 
-class Fields: # батьківський клас у якому прописані __init__, @property, @setter, які наслідують класи Tag, Title, Content
+class Field: # батьківський клас у якому прописані __init__, @property, @setter, які наслідують класи Tag, Title, Content
     def __init__(self, value) -> None:
         self.value = value
 
 
 
-class Tags(Fields): # тег
+class Tag(Field): # тег 
     pass
 
 
-class Title(Fields): # заголовок
+class Title(Field): # заголовок
     pass
 
 
-class Content(Fields): # основний зміст нотатки
+class Content(Field): # основний зміст нотатки
     pass
 
 
 class Note: 
-    def __init__(self, title, content, tag = None):
-        self.tag = tag
-        self.title = title
-        self.content = content
+    def __init__(self, title: str, content: str, tag = None):
+        self.tag = tag # список
+        self.title = title # строка
+        self.content = content # строка
+        
+        
 
 
 
 class NoteBook(UserDict): # контейнер для нотаток
     
-    def add_note(self, note): # додає нотатку в словник ключем якого є заголовок
-        self.data[note.title.value] = note
+    def add_note(self, note): # додає нотатку в словник ключем якого є id
+        self.data[id(note)] = {}
+        self.data[id(note)]["title"] = note.title.value
+        self.data[id(note)]["content"] = note.content.value
+        self.data[id(note)]["tags"] = note.tad.value
 
     def search_by_title(self, title): # пошук по заголовку
         pass
