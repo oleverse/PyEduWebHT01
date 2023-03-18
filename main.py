@@ -36,14 +36,36 @@ def sanitize_phone_number(phone):
     return new_phone
 
 def isValid(email):
+    print("Add Email?")
+    chose = input("y/n: ")
+    if "y" in chose:
+        email = (input("Add Email: "))
+        """Check Email"""
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
 
-    regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+        if re.fullmatch(regex, email):
+            return email
+        else:
+            print("Invalid email")
+            return isValid(email)
+    if "n" in chose:
+        pass
 
-    if re.fullmatch(regex, email):
-        return email
-    else:
-        print("Invalid email")
-        return None
+def isValidAddress(address_home):
+    print("Add Addres?")
+    chose = input("y/n: ")
+    if "y" in chose:
+        address_home = (input("Add Address: "))
+        if len(address_home) > 50:
+            print("Too long Address")
+            return isValidAddress(address_home)
+        else:
+            return address_home
+
+    if "n" in chose:
+        pass
+
+
 
 
 def input_error(handler):
@@ -106,14 +128,8 @@ def add_handler(data):
         phone = Phone(sanitize_phone_number(data[1]))
         if len(data) == 3:
             birthday = Birthday(data[2])
-        if len(data) == 4:
-            birthday = Birthday(data[2])
-            email = Email(isValid(data[3]))
-        if len(data) == 5:
-            birthday = Birthday(data[2])
-            email = Email(isValid(data[3]))
-
-            address_home = AddressHome(data[4])
+            email = Email(isValid(email))
+            address_home = AddressHome(isValidAddress(address_home))
 
     if CONTACTS.add_record(Record(name, phone, birthday, email, address_home)):
         return "Contact successfully added."
