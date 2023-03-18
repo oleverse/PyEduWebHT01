@@ -97,12 +97,8 @@ class Birthday(Field):
 
 class Email(Field):
 
-
-
     def __init__(self, value: str) -> None:
         self.value = value
-
-
 
 class AddressHome(Field):
     def __init__(self, value: str) -> None:
@@ -220,18 +216,34 @@ class AddressBook(UserDict):
         else:
             print("Bad record type, should be Record()")
             return False
-   
+
+    def search_bd(self, days: str):
+        if not days.isdecimal():
+            return None
+        found1 = AddressBook()
+        for key in self.data:
+            if self.data[key].days_to_birthday() <= int(days):
+                found1.add_record(self.data[key])
+
+        return found1 if len(found1.data) else None
+
     def search(self, pattern: str):
         found = AddressBook()
         for name, record in self.data.items():
             if re.match(f".*{pattern}.*", name):
                 if isinstance(record, Record):
                     found.add_record(record)
+
+
             else:
                 for phone in record.phones:
                     if re.match(f".*{pattern}.*", phone.value, re.IGNORECASE):
                         if isinstance(record, Record):
                             found.add_record(record)
+
+
+
+
         return found if len(found.data) else None
 
     def iterator(self, records_number=1):

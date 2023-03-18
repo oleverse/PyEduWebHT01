@@ -37,9 +37,10 @@ def sanitize_phone_number(phone):
 
 def isValid(email):
     print("Add Email?")
-    chose = input("y/n: ")
-    if "y" in chose:
+    chose = input("Y/n: ").strip()
+    if not chose or "y" == chose:
         email = (input("Add Email: "))
+
         """Check Email"""
         regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
 
@@ -48,25 +49,18 @@ def isValid(email):
         else:
             print("Invalid email")
             return isValid(email)
-    if "n" in chose:
-        pass
 
 def isValidAddress(address_home):
     print("Add Addres?")
-    chose = input("y/n: ")
-    if "y" in chose:
+    chose = input("Y/n: ")
+    if not chose or "y" == chose:
         address_home = (input("Add Address: "))
+
         if len(address_home) > 50:
             print("Too long Address")
             return isValidAddress(address_home)
         else:
             return address_home
-
-    if "n" in chose:
-        pass
-
-
-
 
 def input_error(handler):
     """Errors handler"""
@@ -181,8 +175,10 @@ def change_phone_handler(data):
 
 @input_error
 def change_birthday_handler(data):
+
     try:
         the_contact = CONTACTS[data[0]]
+
     except KeyError:
         return "Contact not found."
     else:
@@ -218,15 +214,18 @@ def new_phone_handler(data):
             return "Phone number has been added."
         else:
             return "Phone number has not been added."
-    
+
 
 @input_error
 def find_handler(data):
-    if (found := CONTACTS.search(data[0])):
+    if found := CONTACTS.search(data[0]):
         return found
     else:
         return "Contact not found."
 
+def bd_search(data):
+    if found := CONTACTS.search_bd(data[0]):
+        return found
 
 @input_error
 def show_all_handler(data=None):
@@ -310,6 +309,11 @@ COMMANDS = {
         "handler": find_handler,
         "args_count": 1,
         "description": "looks through contacts names and phones by a key"
+    },
+    "search": {
+        "handler": bd_search,
+        "args_count": 1,
+        "description": "Search in the address book who has a birthday in the coming days"
     },
     "show all": {
         "handler": show_all_handler,
