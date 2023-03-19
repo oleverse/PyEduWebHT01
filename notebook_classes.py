@@ -10,7 +10,14 @@ class Field: # батьківський клас у якому прописан�
 
 
 class Tag(Field): # тег 
-    pass
+
+    def __init__(self, value):
+        super().__init__(value)
+        self.notes = []
+  
+    def add_note(self, note):
+        self.notes.append(note.note_id)
+
 
 
 class Title(Field): # заголовок
@@ -22,22 +29,26 @@ class Content(Field): # основний зміст нотатки
 
 
 class Note: 
-    def __init__(self, title: str, content: str, tag = None):
-        self.tag = tag # список
-        self.title = title # строка
-        self.content = content # строка
-        
-        
+    def __init__(self, title: Title, content: Content):
+        self.title = title 
+        self.content = content 
+        self.note_id = id(self)
 
 
 
 class NoteBook(UserDict): # контейнер для нотаток
     
+    def __init__(self):
+        self.tag_list = []
+    
     def add_note(self, note): # додає нотатку в словник ключем якого є id
-        self.data[id(note)] = {}
-        self.data[id(note)]["title"] = note.title.value
-        self.data[id(note)]["content"] = note.content.value
-        self.data[id(note)]["tags"] = note.tad.value
+        self.data[note.note_id] = note
+
+    def owerwrite(self, note_id: int, new_note):
+        pass
+   
+    def add_tag(self, tag: Tag, note_id: int):
+        pass
 
     def search_by_title(self, title): # пошук по заголовку
         pass
@@ -48,11 +59,9 @@ class NoteBook(UserDict): # контейнер для нотаток
     def show_all(self): # поврптає усі нотатки
         pass
 
-    def del_note(self, title): # видаляє нотатки по заголовку
-        pass
-
-    def owerwrite(self, title): # дописати нотатку по заголовку
-        pass
+    def del_note(self, note_id): # видаляє нотатки по id
+        self.data.pop(note_id)
+        return self.data
 
     def save_to_file(self): # зберігає у файлі
         pass
