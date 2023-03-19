@@ -40,11 +40,11 @@ class NoteBook(UserDict): # контейнер для нотаток
     def __init__(self):
         super().__init__()
         self.__max_note_id = self.__get_max_note_id()
-        self.tag_list = []
+        self.tag_list = {}
     
     def __get_max_note_id(self):
         if len(self.data) > 0:
-            return max([note.id for note in self.data.values()], reverse=True)
+            return max([note.id for note in self.data.values()])
 
         return 0
 
@@ -53,18 +53,32 @@ class NoteBook(UserDict): # контейнер для нотаток
         note.id = self.__max_note_id
         self.data[note.id] = note
 
-    def owerwrite(self, note_id: int, new_note):
+    def overwrite(self, note_id: int, new_note):
         pass
    
-    def add_tag(self, tag: Tag, note_id: int):
-        pass
+    def add_tag(self, tag: Tag):
+        if tag.value not in self.tag_list.keys():
+            self.tag_list[tag.value] = tag
+        else:
+            self.tag_list[tag.value].notes.extend(tag.notes)
+            self.tag_list[tag.value].notes = list(set(self.tag_list[tag.value].notes))
 
     def del_tag(self, tag: Tag):
-        pass
+        self.tag_list.pop(tag.value, None)
 
-    def untag_note(Tag, note_id)
+    def untag_note(self, tag, note_id):
+        try:
+            for i in self.tag_list[tag.value].notes:
+                if i == note_id:
+                    self.tag_list[tag.value].notes.remove(i)
+                    break
+        except KeyError:
+            return False
+
     
-    def clear_tags(note_id)
+    def clear_note_tags(self, note_id):
+        for tag in self.tag_list.values():
+            self.untag_note(tag, note_id)
 
     def search_by_title(self, title): # пошук по заголовку
         pass
