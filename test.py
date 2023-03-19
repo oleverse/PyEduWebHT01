@@ -30,11 +30,11 @@ tag.add_note(note1)
 
 notebook.add_tag(tag)
 
-for v, tag in notebook.tag_list.items():
+for v, tag in notebook.tags.items():
     print(tag.notes)
 
 notebook.clear_note_tags(1)
 
-for v, tag in notebook.tag_list.items():
+for v, tag in notebook.tags.items():
     print(tag.notes)
 

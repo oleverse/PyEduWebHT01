@@ -2,11 +2,9 @@ from collections import UserDict
 import pickle
 
 
-
 class Field: # батьківський клас у якому прописані __init__, @property, @setter, які наслідують класи Tag, Title, Content
     def __init__(self, value) -> None:
         self.value = value
-
 
 
 class Tag(Field): # тег 
@@ -17,7 +15,6 @@ class Tag(Field): # тег
   
     def add_note(self, note):
         self.notes.append(note.id)
-
 
 
 class Title(Field): # заголовок
@@ -40,7 +37,7 @@ class NoteBook(UserDict): # контейнер для нотаток
     def __init__(self):
         super().__init__()
         self.__max_note_id = self.__get_max_note_id()
-        self.tag_list = {}
+        self.tags = {}
     
     def __get_max_note_id(self):
         if len(self.data) > 0:
@@ -48,53 +45,52 @@ class NoteBook(UserDict): # контейнер для нотаток
 
         return 0
 
-    def add_note(self, note: Note): # додає нотатку в словник ключем якого є id
+    def add_note(self, note: Note):  # додає нотатку в словник ключем якого є id
         self.__max_note_id += 1
         note.id = self.__max_note_id
         self.data[note.id] = note
 
-    def overwrite(self, note_id: int, new_note):
-        pass
-   
-    def add_tag(self, tag: Tag):
-        if tag.value not in self.tag_list.keys():
-            self.tag_list[tag.value] = tag
-        else:
-            self.tag_list[tag.value].notes.extend(tag.notes)
-            self.tag_list[tag.value].notes = list(set(self.tag_list[tag.value].notes))
-
-    def del_tag(self, tag: Tag):
-        self.tag_list.pop(tag.value, None)
-
-    def untag_note(self, tag, note_id):
-        try:
-            for i in self.tag_list[tag.value].notes:
-                if i == note_id:
-                    self.tag_list[tag.value].notes.remove(i)
-                    break
-        except KeyError:
-            return False
-
-    
-    def clear_note_tags(self, note_id):
-        for tag in self.tag_list.values():
-            self.untag_note(tag, note_id)
-
-    def search_by_title(self, title): # пошук по заголовку
-        pass
-
-    def search_by_tag(self, tag): # пошук по гегу
-        pass
-
-    def show_all(self): # поврптає усі нотатки
-        pass
-
-    def del_note(self, note_id): # видаляє нотатки по id
+    def del_note(self, note_id):  # видаляє нотатки по id
         self.data.pop(note_id)
         return self.data
 
-    def save_to_file(self): # зберігає у файлі
+    def overwrite_note(self, note_id: int, new_note):
+        pass
+   
+    def add_tag(self, tag: Tag):
+        if tag.value not in self.tags.keys():
+            self.tags[tag.value] = tag
+        else:
+            self.tags[tag.value].notes.extend(tag.notes)
+            self.tags[tag.value].notes = list(set(self.tags[tag.value].notes))
+
+    def del_tag(self, tag: Tag):
+        self.tags.pop(tag.value, None)
+
+    def untag_note(self, tag, note_id):
+        try:
+            for note in self.tags[tag.value].notes:
+                if note == note_id:
+                    self.tags[tag.value].notes.remove(note)
+                    break
+        except KeyError:
+            return False
+    
+    def clear_note_tags(self, note_id):
+        for tag in self.tags.values():
+            self.untag_note(tag, note_id)
+
+    def search(self, text: str): # пошук по заголовку
         pass
 
-    def load_from_file(self): # завантажує з файлу
+    def get_by_tag(self, tag: Tag, sort=False): # пошук по гегу
+        pass
+
+    def get_all(self): # поврптає усі нотатки
+        pass
+
+    def save_to_file(self, file_name="notebook.dat"): # зберігає у файлі
+        pass
+
+    def load_from_file(self, file_name="notebook.dat"): # завантажує з файлу
         pass
