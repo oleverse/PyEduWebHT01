@@ -16,7 +16,7 @@ class Tag(Field): # тег
         self.notes = []
   
     def add_note(self, note):
-        self.notes.append(note.note_id)
+        self.notes.append(note.id)
 
 
 
@@ -58,6 +58,13 @@ class NoteBook(UserDict): # контейнер для нотаток
    
     def add_tag(self, tag: Tag, note_id: int):
         pass
+
+    def del_tag(self, tag: Tag):
+        pass
+
+    def untag_note(Tag, note_id)
+    
+    def clear_tags(note_id)
 
     def search_by_title(self, title): # пошук по заголовку
         pass
