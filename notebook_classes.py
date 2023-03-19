@@ -32,17 +32,26 @@ class Note:
     def __init__(self, title: Title, content: Content):
         self.title = title 
         self.content = content 
-        self.note_id = id(self)
-
+        self.id = 0
 
 
 class NoteBook(UserDict): # контейнер для нотаток
     
     def __init__(self):
+        super().__init__()
+        self.__max_note_id = self.__get_max_note_id()
         self.tag_list = []
     
-    def add_note(self, note): # додає нотатку в словник ключем якого є id
-        self.data[note.note_id] = note
+    def __get_max_note_id(self):
+        if len(self.data) > 0:
+            return max([note.id for note in self.data.values()], reverse=True)
+
+        return 0
+
+    def add_note(self, note: Note): # додає нотатку в словник ключем якого є id
+        self.__max_note_id += 1
+        note.id = self.__max_note_id
+        self.data[note.id] = note
 
     def owerwrite(self, note_id: int, new_note):
         pass
