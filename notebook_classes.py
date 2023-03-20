@@ -1,5 +1,6 @@
 from collections import UserDict
 import pickle
+import os
 
 
 
@@ -41,6 +42,7 @@ class NoteBook(UserDict): # контейнер для нотаток
         super().__init__()
         self.__max_note_id = self.__get_max_note_id()
         self.tag_list = []
+        self.__address_db_file = "note_book_data.dat"
     
     def __get_max_note_id(self):
         if len(self.data) > 0:
@@ -53,8 +55,8 @@ class NoteBook(UserDict): # контейнер для нотаток
         note.id = self.__max_note_id
         self.data[note.id] = note
 
-    def owerwrite(self, note_id: int, new_note):
-        pass
+    def owerwrite(self, note_id: int, new_note: Note):    
+        self.data[note_id] = new_note
    
     def add_tag(self, tag: Tag, note_id: int):
         pass
@@ -62,9 +64,18 @@ class NoteBook(UserDict): # контейнер для нотаток
     def del_tag(self, tag: Tag):
         pass
 
-    def untag_note(Tag, note_id)
-    
-    def clear_tags(note_id)
+    def untag_note(Tag, note_id):
+        pass
+
+    def clear_tags(note_id):
+        pass
+
+    def search_by_id (self, note_id):
+        for id, note in self.data.items():
+            if id == note_id:
+                return note
+            else:
+                print("Note not found")
 
     def search_by_title(self, title): # пошук по заголовку
         pass
@@ -80,7 +91,23 @@ class NoteBook(UserDict): # контейнер для нотаток
         return self.data
 
     def save_to_file(self): # зберігає у файлі
-        pass
+        with open(self.__address_db_file, "ab") as file:
+            if file.writable():
+                pickle.dump(self.data, file)
+            else:
+                print(f"Cannot save to {self.__address_db_file} file!")
+                return False
+        return True
 
     def load_from_file(self): # завантажує з файлу
-        pass
+        if not os.path.isfile(self.__address_db_file):
+            print("Database file was not found!")
+            return False
+        
+        with open(self.__address_db_file, 'rb') as file:
+            if file.readable():
+                self.data = pickle.load(file)
+            else:
+                print(f"Cannot read from {self.__address_db_file} file!")
+                return False
+        return True
