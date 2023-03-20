@@ -7,8 +7,8 @@ import shutil
 
 PATH = '/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/'
 list_type_r = set()
-list_type_files = dict(zip(['images', 'video', 'archives', 'documents', 'audio'],
-                           [set(), set(), set(), set(), set(), set()]))
+list_type_files = dict(zip(['images', 'video', 'archives', 'documents', 'audio', 'others_file'],
+                           [set(), set(), set(), set(), set(), set(), set()]))
 dict_arrange = dict(zip(['images', 'video', 'archives', 'documents', 'audio', 'others_file'],
                             [('JPEG', 'PNG', 'JPG', 'SVG'),
                              ('AVI', 'MP4', 'MOV', 'MKV'),
@@ -28,7 +28,12 @@ all_known_type = ['JPEG', 'PNG', 'JPG', 'SVG', 'AVI', 'MP4', 'MOV', 'MKV',
 all_unknown_type = set()
 duplicates = []
 
-def arrange_dir(dir=PATH):
+def arrange_dir(dir):
+    main(dir)
+    print_report()
+
+
+def main(dir):
     p = Path(dir)
     check_name(dir)
     val = listdir(p)
@@ -37,28 +42,38 @@ def arrange_dir(dir=PATH):
     for file_name in val:
         q = p / file_name
         if q.is_dir():
-            arrange_dir(q)
+            main(q)
         else:
             list_type_r.add(file_name.split('.')[-1])
             for dir_in, type_f in dict_arrange.items():
-                if file_name.split('.')[-1].upper() not in all_known_type:
+                if (file_type := file_name.split('.')[-1].upper()) not in all_known_type: # додаємо розширення до списку відомих розширень
                     all_unknown_type.add(file_name.split('.')[-1])
-                if file_name.split('.')[-1].upper() not in all_known_type:
-                    shutil.move(str(dir) + '/' + file_name,
-                                str(PATH) + '/' + 'others_file')
-                list_type_files[dir_in].add(str(file_name))
-                if file_name.split('.')[-1].upper() in dict_arrange['archives']:
+                if file_type not in all_known_type:
+                    try:
+                        shutil.move(str(dir) + '/' + file_name,
+                                str(PATH) + 'others_file')
+                        ad_list_type_files('others_file', file_name)
+                    except shutil.Error:
+                        duplicates.append(file_name)
+                    continue
+                if file_type in dict_arrange['archives']:
                     unzip(q, p / dir_in / file_name.split('.')[0])
-                    arrange_dir(p / dir_in / file_name.split('.')[0])
+                    main(p / dir_in / file_name.split('.')[0])
+                    ad_list_type_files('archives', file_name)
                     break
-                else:
+                elif file_type in type_f:
                     try:
                         shutil.move(str(dir) + '/' + file_name,
                                     str(PATH) + '/' + dir_in)
+                        ad_list_type_files(dir_in, file_name)
                     except shutil.Error:
                         duplicates.append(file_name)
                     break
     del_empy_dir(dir)
+
+
+def ad_list_type_files(dir_in, file_name):
+    list_type_files[dir_in].add(str(file_name))  # додаємо до списку файлів поточний файл
 
 
 def unzip(file, dir):
@@ -109,19 +124,17 @@ def del_empy_dir(dir):
 
 def print_report():
     string_return = ''
-    string_return += 'Список файлів в кожній категорії ' \
-                     '(музика, відео, фото и ін.)\n\n'
+    string_return += 'List of files in each category ' \
+                     '(music, video, photo, etc.)\n\n'
     for i, j in list_type_files.items():
         string_return += i + ' :' + str(j) + '\n'
-    string_return += f'\nПерелік усіх відомих скрипту розширень,' \
-                     f' які зустрічаються в цільовій папці: {list_type_r}'
-    string_return += f'\nПерелік всіх розширень, які скрипту невідомі:' \
+    string_return += f'\nA list of all known script extensions,' \
+                     f' which are found in the target folder: {list_type_r}'
+    string_return += f'\nA list of all extensions unknown to the script:' \
                      f' {all_unknown_type}'
     print(string_return)
 
 if __name__ == '__main__':
     arrange_dir(PATH)
-    del_empy_dir(PATH)
-    print_report()
 
 # print(f'a file {file_name} with that name already exists in the directory')
