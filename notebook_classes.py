@@ -1,6 +1,7 @@
 from collections import UserDict
 import pickle
 import os
+import re
 
 
 # батьківський клас у якому прописані __init__, @property, @setter,
@@ -8,16 +9,6 @@ import os
 class Field:
     def __init__(self, value) -> None:
         self.value = value
-
-
-class Tag(Field):  # тег
-
-    def __init__(self, value):
-        super().__init__(value)
-        self.notes = []
-  
-    def add_note(self, note):
-        self.notes.append(note.id)
 
 
 class Title(Field):  # заголовок
@@ -34,20 +25,56 @@ class Note:
         self.content = content 
         self.id = 0
 
+    def __str__(self):
+        return (f"ID: {self.id}\n"
+                f"+{'-' * (len(self.title) + 4)}+\n"
+                f"|{self.title:^{len(self.title) + 4}}|\n"
+                f"+{'-' * (len(self.title) + 4)}+\n"
+                f"{self.content}")
+
+    def __repr__(self):
+        return self.__str__().replace("\n", "=>")
+
+
+class Tag(Field):  # тег
+    def __init__(self, value):
+        super().__init__(value)
+        self.notes = []
+
+    def add_note(self, note: Note):
+        self.notes.append(note.id)
+
 
 class NoteBook(UserDict):  # контейнер для нотаток
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, init_list: list[Note] = None):
+        init_dict = {n.id: n for n in init_list} if init_list else None
+        super().__init__(init_dict)
         self.__max_note_id = self.__get_max_note_id()
-        self.tags = {}
+        self.tags: dict[str, Tag] = {}
         self.__address_db_file = "note_book_data.dat"
 
     def __get_max_note_id(self):
-        if len(self.data) > 0:
-            return max([note.id for note in self.data.values()])
+        # start with 0
+        # if a first note is added it will have id = 1
+        note_id = 0
 
-        return 0
+        if len(self.data) > 0:
+            note_id = max([note.id for note in self.data.values()])
+
+        return note_id
+
+    def __paginate(self, notes: list[Note], per_page: int = 3):
+        if not notes:
+            return {}
+
+        return NoteBook(notes)
+
+    def __str__(self):
+        return "\n\n".join([str(v) for v in self.data.values()])
+
+    def __repr__(self):
+        return self.__str__().replace("\n", "=>")
 
     def add_note(self, note: Note):  # додає нотатку в словник ключем якого є id
         self.__max_note_id += 1
@@ -62,7 +89,10 @@ class NoteBook(UserDict):  # контейнер для нотаток
         new_note.id = note_id
         self.data[note_id] = new_note
    
-    def add_tag(self, tag: Tag):
+    def add_tag(self, tag: Tag, note_id=None):
+        if note_id is not None and note_id > 0:
+            tag.add_note(self.data[note_id])
+
         if tag.value not in self.tags.keys():
             self.tags[tag.value] = tag
         else:
@@ -85,21 +115,35 @@ class NoteBook(UserDict):  # контейнер для нотаток
         for tag in self.tags.values():
             self.untag_note(tag, note_id)
 
-    def search(self, text: str):  # пошук по заголовку
-        pass
+    def search(self, text: str):  # пошук нотаток
+        # first let's get notes by tag
+        result_list = self.get_by_tag(Tag(text), False)
+        pattern = re.compile(f".*{text}.*")
+        for note in self.data.values():
+            if pattern.search(note.title + note.content):
+                result_list.append(note)
 
+        return self.__paginate(list(set(result_list)))
+
+    # redundant method because Notebook is UserDict derrivative
+    # we can use Notebook()[note_id] instead
     def search_by_id(self, note_id):
-        for id, note in self.data.items():
-            if id == note_id:
+        for n_id, note in self.data.items():
+            if n_id == note_id:
                 return note
         else:
             print("Note not found")
 
-    def get_by_tag(self, tag: Tag, sort=False):  # пошук по гегу
-        pass
+    # this method guarantees to return list[Note]
+    def get_by_tag(self, tag: Tag, paginate=True) -> list[Note]:  # пошук по тегу
+        result = []
+        if tag.value in self.tags.keys():
+            result = [self.data[n] for n in self.tags[tag.value].notes]
+            result = self.__paginate(result) if paginate else result
+        return result
 
-    def get_all(self):  # поврптає усі нотатки
-        pass
+    def get_all(self):  # повертає усі нотатки
+        return self.__paginate(list(self.data.values()))
 
     def save_to_file(self):  # зберігає у файлі
         with open(self.__address_db_file, "ab") as file:
