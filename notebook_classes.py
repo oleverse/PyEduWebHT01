@@ -53,6 +53,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
         self.__max_note_id = self.__get_max_note_id()
         self.tags: dict[str, Tag] = {}
         self.__address_db_file = "note_book_data.dat"
+        self.per_page = 3
 
     def __get_max_note_id(self):
         # start with 0
@@ -68,7 +69,17 @@ class NoteBook(UserDict):  # контейнер для нотаток
         if not notes:
             return {}
 
-        return NoteBook(notes)
+        if per_page <= 0:
+            self.per_page = 3
+            print("Bad per_page value, set to default = 3")
+
+        self.per_page = len(notes) \
+            if per_page > len(notes) else per_page
+
+        ci = 0
+        for _ in range(len(notes) // self.per_page):
+            yield NoteBook(notes[ci:ci + self.per_page])
+            ci += self.per_page
 
     def __str__(self):
         return "\n\n".join([str(v) for v in self.data.values()])
