@@ -26,7 +26,7 @@ all_known_type = ['JPEG', 'PNG', 'JPG', 'SVG', 'AVI', 'MP4', 'MOV', 'MKV',
                  'ZIP', 'GZ', 'TAR', 'DOC', 'DOCX', 'TXT', 'PDF', 'XLSX',
                  'PPTX', 'MP3', 'OGG', 'WAV', 'AMR']
 all_unknown_type = set()
-duplicates = []
+duplicates = set()
 
 def arrange_dir(dir):
     main(dir)
@@ -54,7 +54,7 @@ def main(dir):
                                 str(PATH) + 'others_file')
                         ad_list_type_files('others_file', file_name)
                     except shutil.Error:
-                        duplicates.append(file_name)
+                        duplicates.add(file_name)
                     continue
                 if file_type in dict_arrange['archives']:
                     unzip(q, p / dir_in / file_name.split('.')[0])
@@ -67,7 +67,7 @@ def main(dir):
                                     str(PATH) + '/' + dir_in)
                         ad_list_type_files(dir_in, file_name)
                     except shutil.Error:
-                        duplicates.append(file_name)
+                        duplicates.add(file_name)
                     break
     del_empy_dir(dir)
 
@@ -123,6 +123,7 @@ def del_empy_dir(dir):
 
 
 def print_report():
+    print(f'a file {duplicates} with that name already exists in the directory')
     string_return = ''
     string_return += 'List of files in each category ' \
                      '(music, video, photo, etc.)\n\n'
@@ -137,4 +138,4 @@ def print_report():
 if __name__ == '__main__':
     arrange_dir(PATH)
 
-# print(f'a file {file_name} with that name already exists in the directory')
+
