@@ -2,7 +2,7 @@ import re
 from notebook_classes import *
 
 GOOD_BYE_MSG = "Good bye!"
-COMMAND_ARGS_MAX_COUNT = 3
+COMMAND_ARGS_MAX_COUNT = 1
 INDEX_NOT_FOUND = -1
 
 notebook = NoteBook()
@@ -49,53 +49,107 @@ def content_format(text: str, length = 80) -> str:
     return formatted_text
 
 
+def input_error(handler):
+    """Errors handler"""
+
+    def decorate_handler(data=None):
+        warning = ""
+        if handler.__name__ == "call_handler" and data is not None:
+            command = data[0]
+
+            if data[1]:
+                args_count = len(data[1])
+                if args_count > COMMANDS[command]["args_count"]:
+                    warning = "Extra arguments discarded.\n"
+                    data = data[1][:COMMANDS[command]["args_count"]]
+        try :
+            return f"{warning}{handler(data)}"
+        except KeyError:
+            if handler.__name__ == "call_handler":
+                return "Unknown command."
+        except ValueError:
+            if handler.__name__ == "call_handler":
+                return "Too many arguments."
+        except IndexError:
+            if handler.__name__ in (
+                    "add_handler",
+                    "change_handler"
+            ):
+                if not data:
+                    return "Input should be: name [phone [birthday]]"
+            else :
+                if not data:
+                    return "Specify a name please."
+
+    return decorate_handler
 # command handlers
 
-
+@input_error
 def hello_handler(data=None):
     return "How can I help you?"
 
-
-
+@input_error
 def help_handler(data=None) :
-    field_len = len(sorted(COMMANDS.keys(), key=lambda x : len(x), reverse=True)[0])
+    field_len = len(sorted(COMMANDS.keys(), key=lambda x: len(x), reverse=True)[0])
     print(field_len)
     commands = [f"{c:<{field_len}} - {COMMANDS[c]['description']}" for c in COMMANDS]
     return f"   Available commands:\n\t" + '\n\t'.join(sorted(commands))
 
-
-
-def add_note() -> str:
+@input_error
+def add_note(data=None) -> str:
     title = Title(input(f"Title: "))
-    if len(title) > 80:
+    if len(title.value) > 80:
         return "The title must contain no more than 80 symbols"
-    content = content_format(input(f"Content: "))
+    content = Content(content_format(input(f"Content: ")))
     notebook.add_note(Note(title, content))
     return "Note successfully added."
 
+@input_error
 def note_del(data):
     notebook.del_note(int(data[0]))
+    return "Note deleted"
 
+@input_error
 def search_id(data):
-    notebook.search_by_id(int(data[0]))
+    return notebook.search_by_id(int(data[0]))
 
-def search_note():
-    pass
-    #notebook.search(str(input()))
+@input_error
+def search_note(data):
+    return notebook.search(data[0], paginate=False)
 
-def add_tag(note_id):
-    pass
-    #tag = Tag(input(f"Add Tag: "))
-    #note_id = str(note_id)
+@input_error
+def add_tag(data):
+    tag = Tag(input(f"Add Tag: "))
+    note_id = int(data[0])
+    notebook.add_tag(tag, note_id)
+    return "Tag added"
+@input_error
+def del_tag(data):
+    notebook.del_tag(Tag(data[0]))
+    return "Tag Deleted"
 
-    #notebook.add_tag(tag, note_id)
+@input_error
+def search_tag(data):
+    return notebook.get_by_tag(Tag(data[0]), False)
 
-def del_tag():
-    pass
+@input_error
+def clear_tags(data):
+    notebook.clear_note_tags(data[0])
+    return "Tags Deleted"
 
-def search_tag():
-    pass
+@input_error
+def untag_note(note_id, tag):
+    tag = Tag(input())
+    note_id = note_id
+    notebook.untag_note(tag, note_id)
+    return "Tag deleted on Note"
 
+@input_error
+def show_tags(data=None):
+    tags_list = content_format(", ".join([tag for tag in notebook.tags]))
+    return tags_list
+
+@input_error
 def show_all_handler(data=None):
     if len(notebook) == 0:
         return "I do not have any contacts yet."
@@ -120,8 +174,7 @@ def show_all_handler(data=None):
     else:
         return str(notebook)
 
-
-
+@input_error
 def exit_handler(data=None):
     if notebook.save_to_file():
         print("Database saved.")
@@ -135,6 +188,11 @@ COMMANDS = {
         "args_count": 0,
         "description": "shows greetings"
     },
+    "show tags": {
+        "handler": show_tags,
+        "args_count": 0,
+        "description": "shows all tags"
+    },
     "help": {
         "handler": help_handler,
         "args_count": 0,
@@ -143,32 +201,52 @@ COMMANDS = {
     "add note": {
         "handler": add_note,
         "args_count": 0,
-        "description": "adds a contact to the address book"
+        "description": "adds note to the Notebook"
     },
     "add tag": {
         "handler": add_tag,
         "args_count": 1,
-        "description": "adds a contact to the address book"
+        "description": "adds a tag to the Notebook"
     },
     "del note": {
         "handler": note_del,
         "args_count": 1,
-        "description": "adds a contact to the address book"
+        "description": "Deleted note on Notebook"
+    },
+    "del tag": {
+        "handler": del_tag,
+        "args_count": 1,
+        "description": "Deleted tag"
+    },
+    "search tag": {
+        "handler": search_tag,
+        "args_count": 1,
+        "description": "Search tag in Notebook"
     },
     "search id": {
         "handler": search_id,
         "args_count": 1,
-        "description": "adds a contact to the address book"
+        "description": "Print Noute "
     },
     "find note": {
         "handler": search_note,
         "args_count": 1,
-        "description": "adds a contact to the address book"
+        "description": "Find note on the Notebook"
+    },
+    "clear tags": {
+        "handler": clear_tags,
+        "args_count": 1,
+        "description": "Clear tags"
     },
     "show all": {
         "handler": show_all_handler,
         "args_count": 1,
-        "description": "prints all contacts with pagination"
+        "description": "prints all Notes on Notebook"
+    },
+    "untag": {
+        "handler": untag_note,
+        "args_count": 1,
+        "description": "Untag note"
     },
     "exit": {
         "handler": exit_handler,
@@ -177,25 +255,25 @@ COMMANDS = {
     }
 }
 
-
+@input_error
 def call_handler(command_data):
     if command_data[1] and len(command_data[1]) > COMMAND_ARGS_MAX_COUNT:
         raise ValueError
     return COMMANDS[command_data[0]]["handler"](command_data[1])
 
 
-def main() :
+def main():
     notebook.load_from_file()
 
-    while True :
-        try :
+    while True:
+        try:
             command_with_args = input("Enter command: ").strip()
         except (EOFError, KeyboardInterrupt):
             print()
             exit_handler()
             exit()
 
-        if command_with_args :
+        if command_with_args:
             command_parts = command_with_args.split(' ')
 
             command = None
