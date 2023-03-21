@@ -32,9 +32,6 @@ class Note:
                 f"+{'-' * (len(self.title) + 4)}+\n"
                 f"{self.content}")
 
-    def __repr__(self):
-        return self.__str__().replace("\n", "=>")
-
 
 class Tag(Field):  # тег
     def __init__(self, value):
@@ -83,9 +80,6 @@ class NoteBook(UserDict):  # контейнер для нотаток
 
     def __str__(self):
         return "\n\n".join([str(v) for v in self.data.values()])
-
-    def __repr__(self):
-        return self.__str__().replace("\n", "=>")
 
     def add_note(self, note: Note):  # додає нотатку в словник ключем якого є id
         self.__max_note_id += 1
@@ -157,9 +151,16 @@ class NoteBook(UserDict):  # контейнер для нотаток
         return self.__paginate(list(self.data.values()))
 
     def save_to_file(self):  # зберігає у файлі
-        with open(self.__address_db_file, "ab") as file:
+        with open(self.__address_db_file, "wb") as file:
             if file.writable():
-                pickle.dump(self.data, file)
+                picle_prepared_data = {
+                    "data": self.data,
+                    "__max_note_id": self.__max_note_id,
+                    "tags": self.tags,
+                    "per_page": self.per_page,
+                    "__address_db_file": self.__address_db_file
+                }
+                pickle.dump(picle_prepared_data, file)
             else:
                 print(f"Cannot save to {self.__address_db_file} file!")
                 return False
@@ -172,7 +173,12 @@ class NoteBook(UserDict):  # контейнер для нотаток
 
         with open(self.__address_db_file, 'rb') as file:
             if file.readable():
-                self.data = pickle.load(file)
+                restored_data = pickle.load(file)
+                self.data = restored_data["data"]
+                self.__max_note_id = restored_data["__max_note_id"]
+                self.tags = restored_data["tags"]
+                self.per_page = restored_data["per_page"]
+                self.__address_db_file = restored_data["__address_db_file"]
             else:
                 print(f"Cannot read from {self.__address_db_file} file!")
                 return False
