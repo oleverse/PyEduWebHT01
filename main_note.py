@@ -8,8 +8,49 @@ INDEX_NOT_FOUND = -1
 notebook = NoteBook()
 
 
+def split_by_len_line(text: str, length: int, split_list=[])-> list:
+    '''recursively splits the text by the specified length.
+    returns a list of text chunks of approximately the same length.
+    fucking recursion! I worked with her all night'''
+    if len(text) <= length:
+        split_list.append(text)
+        return split_list
+    else:
+        index = length
+        while index > 0 and text[index] != ' ':
+            index -= 1
+        split_list.append(text[:index])
+        return split_by_len_line(text[index+1:], length, split_list)
+
+
+def make_line_longer(line: str, num_of_space: int) -> str:
+    '''increases the string length by adding spaces between words'''
+    words = line.split(" ")
+    result = "  ".join(words[:num_of_space+1])
+    others = " ".join(words[num_of_space+1:])
+    result += f" {others}"
+    return result
+
+
+def content_format(text: str, length = 80) -> str:
+    '''formats text by line length'''
+    formatted_text = ""
+    separated_text = split_by_len_line(text, length)
+    for line in separated_text:
+        if line == separated_text[-1]:
+            formatted_text += f'{line}'
+        else:
+            if len(line) == length - 1:
+                formatted_text = f"{line}\n"
+            else:
+                num_of_space = length - len(line)
+                longer_line = make_line_longer(line, num_of_space)
+                formatted_text += f"{longer_line}\n"
+    return formatted_text
+
 
 # command handlers
+
 
 def hello_handler(data=None):
     return "How can I help you?"
@@ -26,7 +67,9 @@ def help_handler(data=None) :
 
 def add_note() -> str:
     title = Title(input(f"Title: "))
-    content = Content(input(f"Content: "))
+    if len(title) > 80:
+        return "The title must contain no more than 80 symbols"
+    content = content_format(input(f"Content: "))
     notebook.add_note(Note(title, content))
     return "Note successfully added."
 
