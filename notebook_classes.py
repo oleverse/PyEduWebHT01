@@ -137,7 +137,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
     def search_by_id(self, note_id):
         for n_id, note in self.data.items():
             if n_id == note_id:
-                return note
+                return print(note)
         else:
             print("Note not found")
 

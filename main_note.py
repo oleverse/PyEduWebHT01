@@ -24,13 +24,34 @@ def help_handler(data=None) :
 
 
 
-def add_note(data) -> str:
+def add_note() -> str:
     title = Title(input(f"Title: "))
     content = Content(input(f"Content: "))
     notebook.add_note(Note(title, content))
     return "Note successfully added."
 
+def note_del(data):
+    notebook.del_note(int(data[0]))
 
+def search_id(data):
+    notebook.search_by_id(int(data[0]))
+
+def search_note():
+    pass
+    #notebook.search(str(input()))
+
+def add_tag(note_id):
+    pass
+    #tag = Tag(input(f"Add Tag: "))
+    #note_id = str(note_id)
+
+    #notebook.add_tag(tag, note_id)
+
+def del_tag():
+    pass
+
+def search_tag():
+    pass
 
 def show_all_handler(data=None):
     if len(notebook) == 0:
@@ -77,6 +98,26 @@ COMMANDS = {
     "add note": {
         "handler": add_note,
         "args_count": 0,
+        "description": "adds a contact to the address book"
+    },
+    "add tag": {
+        "handler": add_tag,
+        "args_count": 1,
+        "description": "adds a contact to the address book"
+    },
+    "del note": {
+        "handler": note_del,
+        "args_count": 1,
+        "description": "adds a contact to the address book"
+    },
+    "search id": {
+        "handler": search_id,
+        "args_count": 1,
+        "description": "adds a contact to the address book"
+    },
+    "find note": {
+        "handler": search_note,
+        "args_count": 1,
         "description": "adds a contact to the address book"
     },
     "show all": {
