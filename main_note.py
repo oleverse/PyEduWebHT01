@@ -1,5 +1,7 @@
 import re
 from notebook_classes import *
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import prompt
 
 GOOD_BYE_MSG = "Good bye!"
 COMMAND_ARGS_MAX_COUNT = 1
@@ -269,6 +271,8 @@ COMMANDS = {
         "description": "quits the program"
     }
 }
+commands = ['hello', 'help', 'add note', 'add tag', 'del note',
+            'search id', 'find note', 'show all', 'exit']
 
 @input_error
 def call_handler(command_data):
@@ -279,10 +283,11 @@ def call_handler(command_data):
 
 def main():
     notebook.load_from_file()
+    command_completer = WordCompleter(COMMANDS)
 
     while True:
         try:
-            command_with_args = input("Enter command: ").strip()
+            command_with_args = prompt("Enter command: ", completer=command_completer).strip()
         except (EOFError, KeyboardInterrupt):
             print()
             exit_handler()

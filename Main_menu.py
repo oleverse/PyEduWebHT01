@@ -1,6 +1,6 @@
 from arrange_dir import arrange_dir
-# from main import main as adress_book
-# from notebook_classes import *
+# from main_adrees_book import main as adress_book
+from main_note import main as note_book
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import random
@@ -15,8 +15,7 @@ Select an option:
 '''
 JOKE_FROM_GPT = '''Why did the AI cross the road?\n
 To prove it wasn't chicken, but it didn't need to prove anything to the humans, it already dominated them.'''
-FIRST_MENU = 'Your choice ->'
-COMMANDS = ['help', 'hello', 'hi', 'make jok', 'close', 'quit', 'by', 'goodby', '1', 'arrange_dir']
+FIRST_MENU = 'Your choice -> '
 
 
 def print_about_mla():
@@ -31,15 +30,23 @@ def print_joke():
 def goodby():
     exit(0)
 
-
 def start_arrange_dir():
     dir = input('Give me the link to the dir: ')  #/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/
     arrange_dir(dir)
 
+def start_note_book():
+    note_book()
+
+def start_adress_book():
+    pass
+    # adress_book()
+
+COMMANDS = ['help', 'hello', 'hi', 'make jok', 'close', 'quit', 'by', 'goodby',
+            '1', 'arrange_dir', '2', 'note', 'add note', '3', 'phone_book', 'address_book', 'call']
 FUNCTIONS = [print_about_mla, print_hello, print_hello,
              print_joke, goodby, goodby, goodby, goodby,
-             start_arrange_dir, start_arrange_dir]
-COMANDS_DICT = dict(zip(COMMANDS,FUNCTIONS))
+             start_arrange_dir, start_arrange_dir, start_note_book, start_note_book]
+COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 
 def main():
@@ -52,7 +59,3 @@ if __name__ == '__main__':
     print(ABOUT_MLA)
     while True:
         main()
-
-
-
-
