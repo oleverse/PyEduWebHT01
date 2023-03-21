@@ -1,9 +1,8 @@
 from os import listdir, rename, rmdir
 from pathlib import Path
 import shutil
+from prettytable import PrettyTable
 
-
-# python3 clean.py '/Users/mykhailo/studies/go_it/my_little_assistant' for test
 
 PATH = '/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/'
 list_type_r = set()
@@ -27,49 +26,59 @@ all_known_type = ['JPEG', 'PNG', 'JPG', 'SVG', 'AVI', 'MP4', 'MOV', 'MKV',
                  'PPTX', 'MP3', 'OGG', 'WAV', 'AMR']
 all_unknown_type = set()
 duplicates = set()
+report = PrettyTable()
+report.field_names = ['path_before', 'path_after', 'name_after']
+
 
 def arrange_dir(dir):
-    main(dir)
+    PATH = dir
+    check_name(dir)
+    main(dir, PATH)
     print_report()
 
 
-def main(dir):
+def main(dir, PATH):
     p = Path(dir)
-    check_name(dir)
+    check_name(p)
     val = listdir(p)
     for i in dict_arrange:
-        (p / i).mkdir()
+        try:
+            (p / i).mkdir()
+        except FileExistsError:
+            pass
     for file_name in val:
         q = p / file_name
         if q.is_dir():
-            main(q)
+            main(q, PATH)
         else:
             list_type_r.add(file_name.split('.')[-1])
             for dir_in, type_f in dict_arrange.items():
                 if (file_type := file_name.split('.')[-1].upper()) not in all_known_type: # додаємо розширення до списку відомих розширень
                     all_unknown_type.add(file_name.split('.')[-1])
-                if file_type not in all_known_type:
+                if file_type not in all_known_type and file_name not in duplicates:
                     try:
-                        shutil.move(str(dir) + '/' + file_name,
-                                str(PATH) + 'others_file')
-                        ad_list_type_files('others_file', file_name)
+                        move_file(dir, file_name, PATH, 'others_file')
                     except shutil.Error:
-                        duplicates.add(file_name)
+                        pass
                     continue
                 if file_type in dict_arrange['archives']:
-                    unzip(q, p / dir_in / file_name.split('.')[0])
-                    main(p / dir_in / file_name.split('.')[0])
+                    unzip(q, PATH + '/' + 'archives' + '/' + file_name.split('.')[0])
                     ad_list_type_files('archives', file_name)
+                    add_to_report(dir, str(PATH) + 'archives', file_name)
                     break
                 elif file_type in type_f:
                     try:
-                        shutil.move(str(dir) + '/' + file_name,
-                                    str(PATH) + '/' + dir_in)
-                        ad_list_type_files(dir_in, file_name)
+                        move_file(dir, file_name, PATH, dir_in)
                     except shutil.Error:
-                        duplicates.add(file_name)
-                    break
+                        pass
     del_empy_dir(dir)
+
+
+def move_file(dir, file_name, PATH, dir_in):
+    shutil.move(str(dir) + '/' + file_name,
+                str(PATH) + dir_in)
+    ad_list_type_files(dir_in, file_name)
+    add_to_report(dir, str(PATH) + dir_in + '/', file_name)
 
 
 def ad_list_type_files(dir_in, file_name):
@@ -80,14 +89,15 @@ def unzip(file, dir):
     shutil.unpack_archive(file, dir)
     file.unlink()
 
+def translate(name):
+    trans = {}
+    for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
+        trans[ord(c)] = l
+        trans[ord(c.upper())] = l.upper()
+    return name.translate(trans)
+
 
 def normalize(file_name: str):
-    def translate(name):
-        trans = {}
-        for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
-            trans[ord(c)] = l
-            trans[ord(c.upper())] = l.upper()
-        return name.translate(trans)
     res = ''
     for i in file_name:
         if 96 < ord(i) < 123 or 64 < ord(i) < 91 or i.isdigit() or i == '.':
@@ -98,8 +108,13 @@ def normalize(file_name: str):
             res += '_'
     return res
 
+
 def check_name(dir):
     val = listdir(dir)
+    for i in val:
+        j = normalize(i)
+        if j != i:
+            rename(dir + '/' + i, dir + '/' + j)
     for k in val:
         l = Path(dir)
         p = l / k
@@ -122,20 +137,32 @@ def del_empy_dir(dir):
                 pass
 
 
+def normalise_path(path_1, path_2):
+    path_1 = str(path_1).split('/')
+    path_2 = str(path_2).split('/')
+    for i, j in enumerate(path_1):
+        if j != path_2[i]:
+            path_1 = '/'.join(path_1[i - 1:])
+            path_2 = '/'.join(path_2[i - 1:])
+            break
+    return path_1, path_2
+
+
+def add_to_report(path_before, path_after, name_after):
+    path_before, path_after = normalise_path(path_before, path_after)
+    report.add_row(['..' + path_before, '..' + path_after, name_after])
+
+
 def print_report():
-    print(f'a file {duplicates} with that name already exists in the directory')
+    print(report)
     string_return = ''
-    string_return += 'List of files in each category ' \
-                     '(music, video, photo, etc.)\n\n'
-    for i, j in list_type_files.items():
-        string_return += i + ' :' + str(j) + '\n'
     string_return += f'\nA list of all known script extensions,' \
-                     f' which are found in the target folder: {list_type_r}'
+                     f' which are found in the target folder: \n{list_type_r}\n'
     string_return += f'\nA list of all extensions unknown to the script:' \
-                     f' {all_unknown_type}'
+                     f'\n{all_unknown_type}'
     print(string_return)
+
 
 if __name__ == '__main__':
     arrange_dir(PATH)
-
 
