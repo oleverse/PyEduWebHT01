@@ -233,18 +233,20 @@ def show_all_handler(data=None):
         return "I do not have any contacts yet."
     
     if data:
-        pages_count = int(data[0])
-        for n, page in enumerate(CONTACTS.iterator(pages_count)):
+        items_per_page = int(data[0])
+        all_items = list(CONTACTS.iterator(items_per_page))
+        for n, page in enumerate(CONTACTS.iterator(items_per_page), start=1):
             print(f"Page-{n}:")
             print(page)
 
-            try:
-                answer = input("Continue? [Y/n]: ")
-            except (EOFError, KeyboardInterrupt):
-                answer = "n"
+            if n < len(all_items):
+                try:
+                    answer = input("Continue? [Y/n]: ")
+                except (EOFError, KeyboardInterrupt):
+                    answer = "n"
 
-            if answer == "n":
-                break
+                if answer == "n":
+                    break
         else:
             return "Done!"
     else:

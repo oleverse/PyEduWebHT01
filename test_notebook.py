@@ -14,6 +14,7 @@ fields or methods as needed for illustration.
 Use Relationships 
     """
 
+
 def get_test_notebook():
     notebook = NoteBook()
     # add 100 notes with some randome data
@@ -68,8 +69,8 @@ elif choice == 2:
 
     notebook.add_tag(Tag("bomba"), 99)
 
-    print(notebook.get_by_tag(Tag("bomba")))
-    print(notebook.search("Relationships Date"))
+    print(notebook.get_by_tag(Tag("bomba"), False))
+    print(notebook.search("Relationships Date", False))
     print(notebook.search_by_id(77))
 elif choice == 3:
     for page_n, page in enumerate(get_test_notebook().search("Relationships Date")):
