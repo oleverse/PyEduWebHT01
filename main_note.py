@@ -10,10 +10,30 @@ INDEX_NOT_FOUND = -1
 notebook = NoteBook()
 
 
-def split_by_len_line(text: str, length: int, split_list=[])-> list:
+def show_paginated(notebook: NoteBook, per_page):
+    notebook.per_page = per_page
+    all_notes = list(notebook.get_all())
+    for n, page in enumerate(notebook.get_all(), start=1):
+        print(f"Page-{n}:")
+        print(page)
+
+        if n < len(all_notes):
+            try:
+                answer = input("Continue? [Y/n]: ")
+            except (EOFError, KeyboardInterrupt):
+                answer = "n"
+
+            if answer == "n":
+                break
+
+
+def split_by_len_line(text: str, length: int, split_list: list = None) -> list:
     '''recursively splits the text by the specified length.
     returns a list of text chunks of approximately the same length.
     fucking recursion! I worked with her all night'''
+    if split_list is None:
+        split_list = []
+
     if len(text) <= length:
         split_list.append(text)
         return split_list
@@ -86,9 +106,11 @@ def input_error(handler):
     return decorate_handler
 # command handlers
 
+
 @input_error
 def hello_handler(data=None):
     return "How can I help you?"
+
 
 @input_error
 def help_handler(data=None):
@@ -96,6 +118,7 @@ def help_handler(data=None):
     print(field_len)
     commands = [f"{c:<{field_len}} - {COMMANDS[c]['description']}" for c in COMMANDS]
     return f"   Available commands:\n\t" + '\n\t'.join(sorted(commands))
+
 
 @input_error
 def add_note(data=None) -> str:
@@ -106,18 +129,23 @@ def add_note(data=None) -> str:
     notebook.add_note(Note(title, content))
     return "Note successfully added."
 
+
 @input_error
 def note_del(data):
     notebook.del_note(int(data[0]))
     return "Note deleted"
 
+
 @input_error
 def search_id(data):
     return notebook.search_by_id(int(data[0]))
 
+
 @input_error
 def search_note(data):
-    return notebook.search(data[0], paginate=False)
+    show_paginated(notebook.search(data[0], False), 3)
+    return 'Done!'
+
 
 @input_error
 def add_tag(data):
@@ -126,14 +154,18 @@ def add_tag(data):
     notebook.add_tag(tag, note_id)
     return "Tag added"
 
+
 @input_error
 def del_tag(data):
     notebook.del_tag(Tag(data[0]))
     return "Tag Deleted"
 
+
 @input_error
 def search_tag(data):
-    return notebook.get_by_tag(Tag(data[0]), False)
+    show_paginated(notebook.get_by_tag(Tag(data[0]), False), 3)
+    return 'Done!'
+
 
 @input_error
 def remove_note(data):
@@ -149,6 +181,7 @@ def clear_tags(data):
     notebook.clear_note_tags(data[0])
     return "Tags Deleted"
 
+
 @input_error
 def untag_note(note_id, tag):
     tag = Tag(input())
@@ -156,10 +189,12 @@ def untag_note(note_id, tag):
     notebook.untag_note(tag, note_id)
     return "Tag deleted on Note"
 
+
 @input_error
 def show_tags(data=None):
     tags_list = content_format(", ".join([tag for tag in notebook.tags]))
     return tags_list
+
 
 @input_error
 def show_all_handler(data=None):
@@ -167,24 +202,12 @@ def show_all_handler(data=None):
         return "I do not have any notes yet."
 
     if data:
-        notebook.per_page = int(data[0])
-        all_notes = list(notebook.get_all())
-        for n, page in enumerate(notebook.get_all(), start=1):
-            print(f"Page-{n}:")
-            print(page)
+        show_paginated(notebook, int(data[0]))
+        return "Done!"
 
-            if n < len(all_notes):
-                try:
-                    answer = input("Continue? [Y/n]: ")
-                except (EOFError, KeyboardInterrupt):
-                    answer = "n"
-
-                if answer == "n":
-                    break
-        else:
-            return "Done!"
     else:
         return str(notebook)
+
 
 @input_error
 def exit_handler(data=None):
@@ -273,6 +296,7 @@ COMMANDS = {
 }
 commands = ['hello', 'help', 'add note', 'add tag', 'del note',
             'search id', 'find note', 'show all', 'exit']
+
 
 @input_error
 def call_handler(command_data):
