@@ -134,6 +134,15 @@ def search_tag(data):
     return notebook.get_by_tag(Tag(data[0]), False)
 
 @input_error
+def remove_note(data):
+    note_id = int(data[0])
+    title = Title(input(f"New Title: "))
+    content = Content(input(f"New Content: "))
+    new_note = Note(title, content)
+    notebook.overwrite_note(note_id, new_note)
+    return "Note overwrite"
+
+@input_error
 def clear_tags(data):
     notebook.clear_note_tags(data[0])
     return "Tags Deleted"
@@ -223,6 +232,11 @@ COMMANDS = {
         "handler": search_tag,
         "args_count": 1,
         "description": "Search tag in Notebook"
+    },
+    "overwrite": {
+        "handler": remove_note,
+        "args_count": 1,
+        "description": "overwrite note"
     },
     "search id": {
         "handler": search_id,
