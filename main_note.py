@@ -2,7 +2,7 @@ import re
 from notebook_classes import *
 
 GOOD_BYE_MSG = "Good bye!"
-COMMAND_ARGS_MAX_COUNT = 5
+COMMAND_ARGS_MAX_COUNT = 3
 INDEX_NOT_FOUND = -1
 
 notebook = NoteBook()
@@ -11,7 +11,7 @@ notebook = NoteBook()
 
 # command handlers
 
-def hello_handler(data=None) :
+def hello_handler(data=None):
     return "How can I help you?"
 
 
@@ -25,39 +25,39 @@ def help_handler(data=None) :
 
 
 def add_note(data) -> str:
-    title = input(f"Title: ")
-    content = input(f"Content: ")
+    title = Title(input(f"Title: "))
+    content = Content(input(f"Content: "))
     notebook.add_note(Note(title, content))
     return "Note successfully added."
 
 
 
-def show_all_handler(data=None) :
-    if len(notebook) == 0 :
+def show_all_handler(data=None):
+    if len(notebook) == 0:
         return "I do not have any contacts yet."
 
-    if data :
+    if data:
         pages_count = int(data[0])
-        for n, page in enumerate(notebook.iterator(pages_count)) :
+        for n, page in enumerate(notebook.get_all()):
             print(f"Page-{n}:")
             print(page)
 
-            try :
+            try:
                 answer = input("Continue? [Y/n]: ")
-            except (EOFError, KeyboardInterrupt) :
+            except (EOFError, KeyboardInterrupt):
                 answer = "n"
 
-            if answer == "n" :
+            if answer == "n":
                 break
-        else :
+        else:
             return "Done!"
-    else :
+    else:
         return str(notebook)
 
 
 
-def exit_handler(data=None) :
-    if notebook.save_to_file() :
+def exit_handler(data=None):
+    if notebook.save_to_file():
         print("Database saved.")
 
     return GOOD_BYE_MSG
@@ -92,8 +92,8 @@ COMMANDS = {
 }
 
 
-def call_handler(command_data) :
-    if command_data[1] and len(command_data[1]) > COMMAND_ARGS_MAX_COUNT :
+def call_handler(command_data):
+    if command_data[1] and len(command_data[1]) > COMMAND_ARGS_MAX_COUNT:
         raise ValueError
     return COMMANDS[command_data[0]]["handler"](command_data[1])
 
@@ -104,7 +104,7 @@ def main() :
     while True :
         try :
             command_with_args = input("Enter command: ").strip()
-        except (EOFError, KeyboardInterrupt) :
+        except (EOFError, KeyboardInterrupt):
             print()
             exit_handler()
             exit()
@@ -114,16 +114,16 @@ def main() :
 
             command = None
             data = None
-            for i, _ in enumerate(command_parts) :
-                if (command := ' '.join(command_parts[:i + 1])) in list(COMMANDS.keys()) :
-                    data = command_parts[i + 1 :]
+            for i, _ in enumerate(command_parts):
+                if (command := ' '.join(command_parts[:i + 1])) in list(COMMANDS.keys()):
+                    data = command_parts[i + 1:]
                     break
 
             handler_result = call_handler((command, data))
 
             print(handler_result)
 
-            if handler_result == GOOD_BYE_MSG :
+            if handler_result == GOOD_BYE_MSG:
                 break
 
 

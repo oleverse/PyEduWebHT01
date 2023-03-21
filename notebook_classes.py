@@ -12,11 +12,13 @@ class Field:
 
 
 class Title(Field):  # заголовок
-    pass
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 
 class Content(Field):  # основний зміст нотатки
-    pass
+    def __init__(self, value: str) -> None:
+        self.value = value
 
 
 class Note: 
@@ -27,10 +29,10 @@ class Note:
 
     def __str__(self):
         return (f"ID: {self.id}\n"
-                f"+{'-' * (len(self.title) + 4)}+\n"
-                f"|{self.title:^{len(self.title) + 4}}|\n"
-                f"+{'-' * (len(self.title) + 4)}+\n"
-                f"{self.content}")
+                f"+{'-' * (len(self.title.value) + 4)}+\n"
+                f"|{self.title.value:^{len(self.title.value) + 4}}|\n"
+                f"+{'-' * (len(self.title.value) + 4)}+\n"
+                f"{self.content.value}")
 
 
 class Tag(Field):  # тег

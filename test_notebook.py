@@ -23,7 +23,7 @@ def get_test_notebook():
         # content is a bit longer
         content = ' '.join(sample([d for d in some_data.split()],
                                   randint(10, len(some_data.split()) - 1)))
-        notebook.add_note(Note(title, content))
+        notebook.add_note(Note(Title(title), Content(content)))
 
     return notebook
 
