@@ -125,13 +125,14 @@ class NoteBook(UserDict):  # контейнер для нотаток
 
     def search(self, text: str, paginate=True):  # пошук нотаток
         # first let's get notes by tag
-        result_list = self.get_by_tag(Tag(text), False)
+        result_list = list(self.get_by_tag(Tag(text), False).values())
         pattern = re.compile(f".*{text}.*")
         for note in self.data.values():
             if pattern.search(note.title.value + note.content.value):
                 result_list.append(note)
 
         unique = list(set(result_list))
+        unique.sort(key=lambda x: x.id)
         return self.__paginate(unique) if paginate else NoteBook(unique)
 
     # redundant method because Notebook is UserDict derrivative
@@ -143,9 +144,9 @@ class NoteBook(UserDict):  # контейнер для нотаток
         else:
             print("Note not found")
 
-    # this method guarantees to return list[Note]
-    def get_by_tag(self, tag: Tag, paginate=True) -> list[Note]:  # пошук по тегу
-        result = []
+    # this method guarantees to return Notebook
+    def get_by_tag(self, tag: Tag, paginate=True):  # пошук по тегу
+        result = NoteBook()
         if tag.value in self.tags.keys():
             result = [self.data[n] for n in self.tags[tag.value].notes]
             result = self.__paginate(result) if paginate else NoteBook(result)
