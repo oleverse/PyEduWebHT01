@@ -2,6 +2,7 @@ from collections import UserDict
 import pickle
 import os
 import re
+from math import ceil
 
 
 # батьківський клас у якому прописані __init__, @property, @setter,
@@ -13,12 +14,12 @@ class Field:
 
 class Title(Field):  # заголовок
     def __init__(self, value: str) -> None:
-        self.value = value
+        super().__init__(value)
 
 
 class Content(Field):  # основний зміст нотатки
     def __init__(self, value: str) -> None:
-        self.value = value
+        super().__init__(value)
 
 
 class Note: 
@@ -64,19 +65,19 @@ class NoteBook(UserDict):  # контейнер для нотаток
 
         return note_id
 
-    def __paginate(self, notes: list[Note], per_page: int = 3):
+    def __paginate(self, notes: list[Note]):
         if not notes:
             return {}
 
-        if per_page <= 0:
+        if self.per_page <= 0:
             self.per_page = 3
             print("Bad per_page value, set to default = 3")
 
         self.per_page = len(notes) \
-            if per_page > len(notes) else per_page
+            if self.per_page > len(notes) else self.per_page
 
         ci = 0
-        for _ in range(len(notes) // self.per_page):
+        for _ in range(ceil(len(notes) / self.per_page)):
             yield NoteBook(notes[ci:ci + self.per_page])
             ci += self.per_page
 
@@ -122,15 +123,16 @@ class NoteBook(UserDict):  # контейнер для нотаток
         for tag in self.tags.values():
             self.untag_note(tag, note_id)
 
-    def search(self, text: str):  # пошук нотаток
+    def search(self, text: str, paginate=True):  # пошук нотаток
         # first let's get notes by tag
         result_list = self.get_by_tag(Tag(text), False)
         pattern = re.compile(f".*{text}.*")
         for note in self.data.values():
-            if pattern.search(note.title + note.content):
+            if pattern.search(note.title.value + note.content.value):
                 result_list.append(note)
 
-        return self.__paginate(list(set(result_list)))
+        unique = list(set(result_list))
+        return self.__paginate(unique) if paginate else NoteBook(unique)
 
     # redundant method because Notebook is UserDict derrivative
     # we can use Notebook()[note_id] instead
@@ -146,7 +148,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
         result = []
         if tag.value in self.tags.keys():
             result = [self.data[n] for n in self.tags[tag.value].notes]
-            result = self.__paginate(result) if paginate else result
+            result = self.__paginate(result) if paginate else NoteBook(result)
         return result
 
     def get_all(self):  # повертає усі нотатки

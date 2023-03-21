@@ -3,6 +3,7 @@ from datetime import date
 from pickle import dump, load
 import re
 import os
+from math import ceil
 
 
 class Field:
@@ -255,7 +256,7 @@ class AddressBook(UserDict):
             records_number = len(self.data)
 
         ci = 0
-        for _ in range(len(self.data)//records_number):
+        for _ in range(ceil(len(self.data) / records_number)):
             yield AddressBook(list(self.data.items())[ci:ci + records_number])
             ci += records_number
 
