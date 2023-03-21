@@ -89,7 +89,7 @@ def hello_handler(data=None):
     return "How can I help you?"
 
 @input_error
-def help_handler(data=None) :
+def help_handler(data=None):
     field_len = len(sorted(COMMANDS.keys(), key=lambda x: len(x), reverse=True)[0])
     print(field_len)
     commands = [f"{c:<{field_len}} - {COMMANDS[c]['description']}" for c in COMMANDS]
@@ -123,6 +123,7 @@ def add_tag(data):
     note_id = int(data[0])
     notebook.add_tag(tag, note_id)
     return "Tag added"
+
 @input_error
 def del_tag(data):
     notebook.del_tag(Tag(data[0]))
@@ -152,7 +153,7 @@ def show_tags(data=None):
 @input_error
 def show_all_handler(data=None):
     if len(notebook) == 0:
-        return "I do not have any contacts yet."
+        return "I do not have any notes yet."
 
     if data:
         notebook.per_page = int(data[0])
@@ -226,7 +227,7 @@ COMMANDS = {
     "search id": {
         "handler": search_id,
         "args_count": 1,
-        "description": "Print Noute "
+        "description": "Print Note "
     },
     "find note": {
         "handler": search_note,
@@ -291,7 +292,7 @@ def main():
                 break
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     main()
 
 
