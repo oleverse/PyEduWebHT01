@@ -314,7 +314,7 @@ COMMANDS = {
         "args_count": 1,
         "description": "looks through contacts names and phones by a key"
     },
-    "search": {
+    "search bthd": {
         "handler": bd_search,
         "args_count": 1,
         "description": "Search in the address book who has a birthday in the coming days"
