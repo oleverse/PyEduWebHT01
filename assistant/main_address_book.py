@@ -1,5 +1,7 @@
 import re
 from address_book import *
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit import prompt
 
 GOOD_BYE_MSG = "Good bye!"
 COMMAND_ARGS_MAX_COUNT = 5
@@ -328,6 +330,9 @@ COMMANDS = {
         "description": "quits the program"
     }
 }
+commands = ['hello', 'help', 'add', 'delete', 'change phone',
+            'new phone', 'remove phone', 'change birthday',
+            'change name', 'find', 'search', 'show all', 'exit']
 
 
 @input_error
@@ -339,10 +344,11 @@ def call_handler(command_data):
 
 def main():
     CONTACTS.deserialize()
+    command_completer = WordCompleter(COMMANDS)
 
     while True:
         try:
-            command_with_args = input("Enter command: ").strip()
+            command_with_args = prompt("Enter command: ", completer=command_completer).strip()
         except (EOFError, KeyboardInterrupt):
             print()
             exit_handler()

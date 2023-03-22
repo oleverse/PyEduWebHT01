@@ -1,7 +1,7 @@
 import time
 
-from notebook_classes import *
-from random import shuffle, sample, randint
+from assistant.notebook_classes import *
+from random import sample, randint
 
 some_data = """
     This indicates that a Person object has private fields named name and birth
