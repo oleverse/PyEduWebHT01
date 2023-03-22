@@ -6,6 +6,7 @@ from prompt_toolkit import prompt
 GOOD_BYE_MSG = "Good bye!"
 COMMAND_ARGS_MAX_COUNT = 1
 INDEX_NOT_FOUND = -1
+UNKNOWN_TAG = "Not tagged"
 
 notebook = NoteBook()
 
@@ -86,9 +87,11 @@ def input_error(handler):
                     data = data[1][:COMMANDS[command]["args_count"]]
         try :
             return f"{warning}{handler(data)}"
-        except KeyError:
+        except KeyError as k_err:
             if handler.__name__ == "call_handler":
                 return "Unknown command."
+            else:
+                print(k_err)
         except ValueError:
             if handler.__name__ == "call_handler":
                 return "Too many arguments."
@@ -98,10 +101,10 @@ def input_error(handler):
                     "change_handler"
             ):
                 if not data:
-                    return "Input should be: name [phone [birthday]]"
+                    return "Input should be: note_id"
             else :
                 if not data:
-                    return "Specify a name please."
+                    return "Specify a note ID please."
 
     return decorate_handler
 # command handlers
@@ -210,6 +213,31 @@ def show_all_handler(data=None):
 
 
 @input_error
+def sort_by_tags(data=None):
+    sorted_by_tag = {}
+    not_tagged = []
+    id_with_tags = []
+    for tag in sorted(notebook.tags):
+        sorted_by_tag[tag] = notebook.get_by_tag(Tag(tag), False)
+        id_with_tags.extend(notebook.tags[tag].notes)
+
+    id_with_tags = set(id_with_tags)
+
+    for note in notebook.values():
+        if note.id not in id_with_tags:
+            not_tagged.append(note)
+
+    for tag, items in sorted_by_tag.items():
+        print(f"TAG: {tag}:")
+        print('\n'.join([str(n) for n in items.values()]), end="\n\n")
+
+    print(f"TAG: {UNKNOWN_TAG}:")
+    print('\n'.join([str(n) for n in not_tagged]), end="\n\n")
+
+    return "Done!"
+
+
+@input_error
 def exit_handler(data=None):
     if notebook.save_to_file():
         print("Database saved.")
@@ -282,6 +310,11 @@ COMMANDS = {
         "handler": show_all_handler,
         "args_count": 1,
         "description": "prints all Notes on Notebook"
+    },
+    "sort by tags": {
+        "handler": sort_by_tags,
+        "args_count": 0,
+        "description": "outputs all notes sorted by tags"
     },
     "untag": {
         "handler": untag_note,
