@@ -39,9 +39,10 @@ def goodby():
 
 def start_arrange_dir():
     try:
-        dir = input('Give me the link to the dir: ')  #/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/
-    except:
-        start_arrange_dir() # DANGER!!! uncontrolled recursion!
+        dir = input('Give me the link to the dir: ')
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return False
     else:
         arrange_dir(dir)
 
@@ -64,9 +65,12 @@ COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 def main():
     while True:
-        command_completer = WordCompleter(COMMANDS)  # Створення об'єкту WordCompleter для автозаповнення команд
+        command_completer = WordCompleter(COMMANDS)  # Створення об'єкта WordCompleter для автозаповнення команд
         user_input = prompt(FIRST_MENU, completer=command_completer)  # Налаштування промпта з автозаповненням
-        COMANDS_DICT[user_input]()
+        try:
+            COMANDS_DICT[user_input]()
+        except KeyError:
+            print("\nUnknown command!")
 
 
 if __name__ == '__main__':

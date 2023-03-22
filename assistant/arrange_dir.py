@@ -4,7 +4,7 @@ import shutil
 from prettytable import PrettyTable
 
 
-PATH = '/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/'
+PATH = '/tmp'
 list_type_r = set()
 list_type_files = dict(zip(['images', 'video', 'archives', 'documents', 'audio', 'others_file'],
                            [set(), set(), set(), set(), set(), set(), set()]))
