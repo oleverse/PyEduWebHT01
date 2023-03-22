@@ -1,5 +1,5 @@
 import re
-from address_book import *
+from assistant.address_book import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 

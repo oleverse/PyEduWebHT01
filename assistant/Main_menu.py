@@ -1,6 +1,6 @@
-from arrange_dir import arrange_dir
-from main_address_book import main as adress_book
-from main_note import main as note_book
+from assistant.arrange_dir import arrange_dir
+from assistant.main_address_book import main as adress_book
+from assistant.main_note import main as note_book
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import random
@@ -55,12 +55,12 @@ COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 
 def main():
-    command_completer = WordCompleter(COMMANDS)  # Створення об'єкту WordCompleter для автозаповнення команд
-    user_input = prompt(FIRST_MENU, completer=command_completer)  # Налаштування промпта з автозаповненням
-    COMANDS_DICT[user_input]()
+    while True:
+        command_completer = WordCompleter(COMMANDS)  # Створення об'єкту WordCompleter для автозаповнення команд
+        user_input = prompt(FIRST_MENU, completer=command_completer)  # Налаштування промпта з автозаповненням
+        COMANDS_DICT[user_input]()
 
 
 if __name__ == '__main__':
     print(ABOUT_MLA)
-    while True:
-        main()
+    main()
