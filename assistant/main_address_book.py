@@ -107,7 +107,6 @@ def hello_handler(data=None):
 @input_error
 def help_handler(data=None):
     field_len = len(sorted(COMMANDS.keys(), key=lambda x: len(x), reverse=True)[0])
-    print(field_len)
     commands = [f"{c:<{field_len}} - {COMMANDS[c]['description']}" for c in COMMANDS]
     return f"   Available commands:\n\t" + '\n\t'.join(sorted(commands))
 
