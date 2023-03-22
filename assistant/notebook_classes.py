@@ -152,7 +152,9 @@ class NoteBook(UserDict):  # контейнер для нотаток
             result = self.__paginate(result) if paginate else NoteBook(result)
         return result
 
-    def get_all(self):  # повертає усі нотатки
+    def get_all(self, paginate=True):  # повертає усі нотатки
+        if not paginate:
+            return self
         return self.__paginate(list(self.data.values()))
 
     def save_to_file(self):  # зберігає у файлі
