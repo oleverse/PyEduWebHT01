@@ -1,5 +1,5 @@
 from arrange_dir import arrange_dir
-# from main_adrees_book import main as adress_book
+from main_address_book import main as adress_book
 from main_note import main as note_book
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
@@ -31,21 +31,26 @@ def goodby():
     exit(0)
 
 def start_arrange_dir():
-    dir = input('Give me the link to the dir: ')  #/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/
+    try:
+        dir = input('Give me the link to the dir: ')  #/Users/mykhailo/studies/go_it/my_little_assistant/arrange_dir/
+    except:
+        start_arrange_dir()
     arrange_dir(dir)
 
 def start_note_book():
     note_book()
 
 def start_adress_book():
-    pass
-    # adress_book()
+    adress_book()
 
 COMMANDS = ['help', 'hello', 'hi', 'make jok', 'close', 'quit', 'by', 'goodby',
-            '1', 'arrange_dir', '2', 'note', 'add note', '3', 'phone_book', 'address_book', 'call']
-FUNCTIONS = [print_about_mla, print_hello, print_hello,
-             print_joke, goodby, goodby, goodby, goodby,
-             start_arrange_dir, start_arrange_dir, start_note_book, start_note_book]
+            '3', 'arrange_dir', '2', 'note', 'add note', '1', 'phone_book',
+            'address_book', 'call']
+FUNCTIONS = [print_about_mla, print_hello, print_hello, print_joke, goodby,
+             goodby, goodby, goodby, start_arrange_dir, start_arrange_dir,
+             start_note_book, start_note_book, start_adress_book,
+             start_adress_book, start_adress_book, start_adress_book,
+             start_adress_book]
 COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 
