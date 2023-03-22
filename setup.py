@@ -1,7 +1,7 @@
 from setuptools import setup, find_namespace_packages
 
 setup(name='The-soft',
-      version='1.0.2',
+      version='1.0.3',
       description='Sophisticated organizer for thoughtful',
       url='https://github.com/Greezli439/my_little_assistant',
       author='Python Mode',
