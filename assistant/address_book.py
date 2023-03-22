@@ -49,7 +49,7 @@ class Phone(Field):
         return new_phone
 
     @property
-    def value(self) -> str | None:
+    def value(self):
         return self._value
 
     @value.setter
@@ -85,7 +85,7 @@ class Birthday(Field):
         self.value = value
 
     @property
-    def value(self) -> date | None:
+    def value(self):
         return self._value
 
     @value.setter
@@ -106,8 +106,8 @@ class AddressHome(Field):
         self.value = value
 
 class Record:
-    def __init__(self, name: Name, phone: Phone|None = None, 
-                 birthday: Birthday|None = None, email: Email|None = None, address_home: AddressHome|None = None) -> None:
+    def __init__(self, name, phone=None,
+                 birthday=None, email=None, address_home=None) -> None:
         self.name = name
         self.phones = []
         self.birthday = birthday
@@ -138,12 +138,12 @@ class Record:
 
         return result
     
-    def __find_phone(self, phone: Phone) -> int | None:
+    def __find_phone(self, phone: Phone):
         for i, item in enumerate(self.phones):
             if item.value == phone.value:
                 return i
 
-    def days_to_birthday(self) -> int | None:
+    def days_to_birthday(self):
         if self.birthday and self.birthday.value is not None:
             current_date = date.today()
 
