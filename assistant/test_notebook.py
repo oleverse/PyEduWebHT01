@@ -1,4 +1,5 @@
 import time
+from assistant.main_note import *
 
 from assistant.notebook_classes import *
 from random import sample, randint
@@ -18,12 +19,12 @@ Use Relationships
 def get_test_notebook():
     notebook = NoteBook()
     # add 100 notes with some randome data
-    for n in range(100):
+    for n in range(5):
         # for title take from 3 to 7 samples of strings
         title = ' '.join(sample([d for d in some_data.split()], randint(3, 7)))
         # content is a bit longer
-        content = ' '.join(sample([d for d in some_data.split()],
-                                  randint(10, len(some_data.split()) - 1)))
+        content = content_format(' '.join(sample([d for d in some_data.split()],
+                                  randint(10, len(some_data.split()) - 1))))
         notebook.add_note(Note(Title(title), Content(content)))
 
     return notebook
@@ -67,11 +68,12 @@ if (choice := int(input("1 - test add/del tags/notes\n"
 elif choice == 2:
     notebook = get_test_notebook()
 
-    notebook.add_tag(Tag("bomba"), 99)
+    # notebook.add_tag(Tag("bomba"), 99)
 
     print(notebook.get_by_tag(Tag("bomba"), False))
     print(notebook.search("Relationships Date", False))
     print(notebook.search_by_id(77))
+    notebook.save_to_file()
 elif choice == 3:
     for page_n, page in enumerate(get_test_notebook().search("Relationships Date")):
         print(f"================ PAGE: {page_n} =================\n")
