@@ -3,6 +3,7 @@ import pickle
 import os
 import re
 from math import ceil
+from typing import List
 
 
 # батьківський клас у якому прописані __init__, @property, @setter,
@@ -47,7 +48,7 @@ class Tag(Field):  # тег
 
 class NoteBook(UserDict):  # контейнер для нотаток
     
-    def __init__(self, init_list: list[Note] = None):
+    def __init__(self, init_list: List[Note] = None):
         init_dict = {n.id: n for n in init_list} if init_list else None
         super().__init__(init_dict)
         self.__max_note_id = self.__get_max_note_id()
@@ -65,7 +66,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
 
         return note_id
 
-    def __paginate(self, notes: list[Note]):
+    def __paginate(self, notes: List[Note]):
         if not notes:
             return {}
 

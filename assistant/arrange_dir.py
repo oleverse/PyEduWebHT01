@@ -1,3 +1,5 @@
+import os.path
+import typing
 from os import listdir, rename, rmdir
 from pathlib import Path
 import shutil
@@ -31,6 +33,10 @@ report.field_names = ['path_before', 'path_after', 'name_after']
 
 
 def arrange_dir(dir):
+    if not os.path.isdir(dir):
+        print(f"The specified directory was not found!\n")
+        return False
+
     PATH = dir
     check_name(dir)
     main(dir, PATH)
@@ -64,7 +70,7 @@ def main(dir, PATH):
                 if file_type in dict_arrange['archives']:
                     unzip(q, PATH + '/' + 'archives' + '/' + file_name.split('.')[0])
                     ad_list_type_files('archives', file_name)
-                    add_to_report(dir, str(PATH) + 'archives', file_name)
+                    add_to_report(dir, str(PATH) + '/' + 'archives', file_name)
                     break
                 elif file_type in type_f:
                     try:
@@ -76,9 +82,9 @@ def main(dir, PATH):
 
 def move_file(dir, file_name, PATH, dir_in):
     shutil.move(str(dir) + '/' + file_name,
-                str(PATH) + dir_in)
+                str(PATH) + '/' + dir_in)
     ad_list_type_files(dir_in, file_name)
-    add_to_report(dir, str(PATH) + dir_in + '/', file_name)
+    add_to_report(dir, str(PATH) + '/' + dir_in + '/', file_name)
 
 
 def ad_list_type_files(dir_in, file_name):
@@ -145,6 +151,10 @@ def normalise_path(path_1, path_2):
             path_1 = '/'.join(path_1[i - 1:])
             path_2 = '/'.join(path_2[i - 1:])
             break
+    if isinstance(path_1, typing.List):
+        path_1 = os.path.join(*path_1)
+    if isinstance(path_2, typing.List):
+        path_2 = os.path.join(*path_2)
     return path_1, path_2
 
 

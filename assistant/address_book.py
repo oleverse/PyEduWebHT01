@@ -223,7 +223,8 @@ class AddressBook(UserDict):
             return None
         found1 = AddressBook()
         for key in self.data:
-            if self.data[key].days_to_birthday() <= int(days):
+            bday = self.data[key].days_to_birthday()
+            if bday is not None and bday <= int(days):
                 found1.add_record(self.data[key])
 
         return found1 if len(found1.data) else None

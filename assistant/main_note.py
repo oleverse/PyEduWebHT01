@@ -1,3 +1,4 @@
+import pyfiglet
 from assistant.notebook_classes import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
@@ -8,6 +9,10 @@ INDEX_NOT_FOUND = -1
 UNKNOWN_TAG = "Not tagged"
 
 notebook = NoteBook()
+
+
+def print_logo():
+    print(pyfiglet.Figlet().renderText("Notebook"))
 
 
 def show_paginated(notebook: NoteBook, per_page):
@@ -337,6 +342,7 @@ def call_handler(command_data):
 
 
 def main():
+    print_logo()
     notebook.load_from_file()
     command_completer = WordCompleter(COMMANDS)
 

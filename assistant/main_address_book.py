@@ -1,4 +1,7 @@
 import re
+
+import pyfiglet as pyfiglet
+
 from assistant.address_book import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
@@ -8,6 +11,11 @@ COMMAND_ARGS_MAX_COUNT = 5
 INDEX_NOT_FOUND = -1
 
 CONTACTS = AddressBook()
+
+
+def print_logo():
+    print(pyfiglet.Figlet().renderText("Contacts"))
+
 
 # utilities
 def contact_index(name):
@@ -342,6 +350,7 @@ def call_handler(command_data):
 
 
 def main():
+    print_logo()
     CONTACTS.deserialize()
     command_completer = WordCompleter(COMMANDS)
 

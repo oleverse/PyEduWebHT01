@@ -4,6 +4,7 @@ from assistant.main_note import main as note_book
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import random
+import pyfiglet
 
 
 ABOUT_MLA = '''
@@ -38,6 +39,7 @@ def goodby():
     exit(0)
 
 def start_arrange_dir():
+    print(pyfiglet.Figlet().renderText("Arrange Dir"))
     try:
         dir = input('Give me the link to the dir: ')
     except (KeyboardInterrupt, EOFError):
@@ -64,6 +66,7 @@ COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 
 def main():
+    print(ABOUT_MLA)
     while True:
         command_completer = WordCompleter(COMMANDS)  # Створення об'єкта WordCompleter для автозаповнення команд
         user_input = prompt(FIRST_MENU, completer=command_completer)  # Налаштування промпта з автозаповненням
@@ -74,7 +77,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print(ABOUT_MLA)
     try:
         while True:
             main()
