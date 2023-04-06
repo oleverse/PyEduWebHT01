@@ -1,11 +1,10 @@
-from assistant.arrange_dir import arrange_dir
-from assistant.main_address_book import main as adress_book
-from assistant.main_note import main as note_book
+from the_soft.arrange_dir.arrange_dir import arrange_dir
+from the_soft.address_book.main_address_book import main as adress_book
+from the_soft.notebook.main_note import main as note_book
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import random
 import pyfiglet
-
 
 ABOUT_MLA = r'''
   _____  _             ____     ___     _____  _____  
@@ -19,24 +18,30 @@ ABOUT_MLA = r'''
 Select an option:
 [1] Open your contact book;
 [2] Open your note book;
-[3] I can put in order the folder where you put something meaning "it should be sorted later."
+[3] I can put in order the folder where you put something meaning '''\
+'''"it should be sorted later."
 '''
 JOKE_FROM_GPT = '''Why did the AI cross the road?\n
-To prove it wasn't chicken, but it didn't need to prove anything to the humans, it already dominated them.'''
+To prove it wasn't chicken, but it didn't need to prove anything to the '''\
+'''humans, it already dominated them.'''
 FIRST_MENU = 'Your choice -> '
 
 
 def print_about_mla():
     print(ABOUT_MLA)
 
+
 def print_hello():
     print(random.choice(['Hi, how can I help you?', 'Hello, human!']))
+
 
 def print_joke():
     print(JOKE_FROM_GPT)
 
-def goodby():
+
+def goodbye():
     exit(0)
+
 
 def start_arrange_dir():
     print(pyfiglet.Figlet().renderText("Arrange Dir"))
@@ -48,28 +53,33 @@ def start_arrange_dir():
     else:
         arrange_dir(dir)
 
+
 def start_note_book():
     note_book()
+
 
 def start_adress_book():
     adress_book()
 
-COMMANDS = ['help', 'hello', 'hi', 'make jok', 'close', 'quit', 'by', 'goodby',
+
+COMMANDS = ['help', 'hello', 'hi', 'make joke', 'close', 'quit', 'by', 'goodbye',
             '3', 'arrange_dir', '2', 'note', 'add note', '1', 'phone_book',
             'address_book', 'call', 'exit']
-FUNCTIONS = [print_about_mla, print_hello, print_hello, print_joke, goodby,
-             goodby, goodby, goodby, start_arrange_dir, start_arrange_dir,
+FUNCTIONS = [print_about_mla, print_hello, print_hello, print_joke, goodbye,
+             goodbye, goodbye, goodbye, start_arrange_dir, start_arrange_dir,
              start_note_book, start_note_book, start_adress_book,
              start_adress_book, start_adress_book, start_adress_book,
-             start_adress_book, goodby]
+             start_adress_book, goodbye]
 COMANDS_DICT = dict(zip(COMMANDS, FUNCTIONS))
 
 
 def main():
     print(ABOUT_MLA)
     while True:
-        command_completer = WordCompleter(COMMANDS)  # Створення об'єкта WordCompleter для автозаповнення команд
-        user_input = prompt(FIRST_MENU, completer=command_completer)  # Налаштування промпта з автозаповненням
+        # Створення об'єкта WordCompleter для автозаповнення команд
+        command_completer = WordCompleter(COMMANDS)
+        # Налаштування промпта з автозаповненням
+        user_input = prompt(FIRST_MENU, completer=command_completer)
         try:
             COMANDS_DICT[user_input]()
         except KeyError:
@@ -82,4 +92,4 @@ if __name__ == '__main__':
             main()
     except (KeyboardInterrupt, EOFError):
         print("\nSee you later!")
-        goodby()
+        goodbye()

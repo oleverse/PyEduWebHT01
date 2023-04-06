@@ -1,5 +1,5 @@
 import pyfiglet
-from assistant.notebook_classes import *
+from the_soft.notebook.notebook_classes import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 

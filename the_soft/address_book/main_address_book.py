@@ -1,8 +1,6 @@
-import re
-
 import pyfiglet as pyfiglet
 
-from assistant.address_book import *
+from the_soft.address_book.address_book import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 
