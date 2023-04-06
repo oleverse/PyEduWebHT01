@@ -7,7 +7,7 @@ import random
 import pyfiglet
 
 
-ABOUT_MLA = '''
+ABOUT_MLA = r'''
   _____  _             ____     ___     _____  _____  
  |_   _|| |__    ___  / ___|   / _ \   |  ___||_   _| 
    | |  | '_ \  / _ \ \___ \  | | | |  | |_     | |   

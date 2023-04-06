@@ -3,6 +3,7 @@ The S.O.F.T. (by Python Mode command)
 This is the Sophisticated Organizer For Thoughtful people
 
 It consists of three components:
+        
         Arrange Dir  - if you have some directory with a bunch of unsorted files this tool is for you.
                        It helps to tidy up the specified directory and normalize some names.
 
@@ -18,6 +19,7 @@ It consists of three components:
 All the components can be called from the Main Menu which you can see right after The S.O.F.T. starts
 
 Arrange Dir:
+        
         If you choose this component it will ask you for a path to a directory which
         you want to arrange.
         The files in the directory will be grouped by type, names will be normalized by
@@ -45,6 +47,7 @@ Notebook available commands:
         untag        - Removes a specific tag from a specific note.
 
 Contact book available commands:
+
         add             - Adds a contact. Specify name, phone, birthday and optionally email and address
         change birthday - usage: change birthday name new_birthday.
         change name     - usage: change name old_name new_name.
