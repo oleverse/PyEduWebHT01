@@ -8,5 +8,5 @@ setup(name='the_soft',
       license='MIT',
       packages=find_namespace_packages(),
       include_package_data=True,
-      entry_points={'console_scripts': ['the_soft = the_soft.__main__:main']}
+      entry_points={'console_scripts': ['the_soft = the_soft:main']}
       )
