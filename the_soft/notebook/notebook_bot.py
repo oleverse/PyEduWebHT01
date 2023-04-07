@@ -1,7 +1,40 @@
 import pyfiglet
-from the_soft.notebook.notebook_classes import *
+from the_soft.notebook.notebook import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
+from the_soft.abstract.bot import Bot, Item
+from typing import List, Any
+from the_soft.abstract.application import AppComponent
+
+
+class NotebookBot(AppComponent, Bot):
+    def __init__(self):
+        self.__notebook = NoteBook()
+
+    def add_item(self, item: Item) -> bool:
+        pass
+
+    def remove_item(self, item: Item) -> bool:
+        pass
+
+    def get_help(self, short=True) -> None:
+        pass
+
+    def update_item(self, item: Item, new_item: Item) -> bool:
+        pass
+
+    def search(self, pattern: str) -> List[Item]:
+        pass
+
+    def goodbye(self) -> None:
+        pass
+
+    def execute_command(self, command: str) -> Any:
+        pass
+
+    def launch(self):
+        pass
+
 
 GOOD_BYE_MSG = "Good bye!"
 COMMAND_ARGS_MAX_COUNT = 1
@@ -33,9 +66,10 @@ def show_paginated(notebook: NoteBook, per_page):
 
 
 def split_by_len_line(text: str, length: int, split_list: list = None) -> list:
-    '''recursively splits the text by the specified length.
+    """recursively splits the text by the specified length.
     returns a list of text chunks of approximately the same length.
-    fucking recursion! I worked with her all night'''
+    fucking recursion! I worked with her all night"""
+
     if split_list is None:
         split_list = []
 
@@ -51,7 +85,8 @@ def split_by_len_line(text: str, length: int, split_list: list = None) -> list:
 
 
 def make_line_longer(line: str, num_of_space: int) -> str:
-    '''increases the string length by adding spaces between words'''
+    """increases the string length by adding spaces between words"""
+
     words = line.split(" ")
     result = "  ".join(words[:num_of_space+1])
     others = " ".join(words[num_of_space+1:])
@@ -60,7 +95,8 @@ def make_line_longer(line: str, num_of_space: int) -> str:
 
 
 def content_format(text: str, length = 80) -> str:
-    '''formats text by line length'''
+    """formats text by line length"""
+
     formatted_text = ""
     separated_text = split_by_len_line(text, length)
     for line in separated_text:
@@ -111,9 +147,9 @@ def input_error(handler):
                     return "Specify a note ID please."
 
     return decorate_handler
+
+
 # command handlers
-
-
 @input_error
 def hello_handler(data=None):
     return "How can I help you?"

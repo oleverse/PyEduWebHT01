@@ -1,8 +1,40 @@
 import pyfiglet as pyfiglet
-
-from the_soft.address_book.address_book import *
+from the_soft.abstract.application import AppComponent
+from the_soft.contacts.address_book import *
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
+from the_soft.abstract.bot import Bot, Item
+from typing import List, Any
+
+
+class ContactsBot(AppComponent, Bot):
+    def __init__(self):
+        self.__notebook = AddressBook()
+
+    def add_item(self, item: Item) -> bool:
+        pass
+
+    def remove_item(self, item: Item) -> bool:
+        pass
+
+    def get_help(self, short=True) -> None:
+        pass
+
+    def update_item(self, item: Item, new_item: Item) -> bool:
+        pass
+
+    def search(self, pattern: str) -> List[Item]:
+        pass
+
+    def goodbye(self) -> None:
+        pass
+
+    def execute_command(self, command: str) -> Any:
+        pass
+
+    def launch(self):
+        pass
+
 
 GOOD_BYE_MSG = "Good bye!"
 COMMAND_ARGS_MAX_COUNT = 5
@@ -37,11 +69,12 @@ def sanitize_phone_number(phone):
 
     new_phone = re.sub(pattern=ptrn, repl="", string=phone)
     new_phone = (
-        new_phone[0] +
-        new_phone[1:].replace("+", "")
+            new_phone[0] +
+            new_phone[1:].replace("+", "")
     )
 
     return new_phone
+
 
 def isValid(email):
     print("Add Email?")
@@ -58,6 +91,7 @@ def isValid(email):
             print("Invalid email")
             return isValid(email)
 
+
 def isValidAddress(address_home):
     print("Add Addres?")
     chose = input("Y/n: ")
@@ -70,6 +104,7 @@ def isValidAddress(address_home):
         else:
             return address_home
 
+
 def input_error(handler):
     """Errors handler"""
 
@@ -77,7 +112,7 @@ def input_error(handler):
         warning = ""
         if handler.__name__ == "call_handler" and data is not None:
             command = data[0]
-            
+
             if data[1]:
                 args_count = len(data[1])
                 if args_count > COMMANDS[command]["args_count"]:
@@ -92,15 +127,16 @@ def input_error(handler):
             if handler.__name__ == "call_handler":
                 return "Too many arguments."
         except IndexError:
-            if handler.__name__ in(
+            if handler.__name__ in (
                     "add_handler",
                     "change_handler"
-                ):
+            ):
                 if not data:
                     return "Input should be: name [phone [birthday]]"
             else:
                 if not data:
                     return "Specify a name please."
+
     return decorate_handler
 
 
@@ -136,7 +172,7 @@ def add_handler(data):
         return "Contact successfully added."
     else:
         return 'The record exists or an error occured. Try "change" command.'
-    
+
 
 @input_error
 def delete_handler(data):
@@ -162,7 +198,7 @@ def change_name_handler(data):
         else:
             record.name.value = data[0]
             return "Contact has not been successfully renamed."
-    
+
 
 @input_error
 def change_phone_handler(data):
@@ -182,7 +218,6 @@ def change_phone_handler(data):
 
 @input_error
 def change_birthday_handler(data):
-
     try:
         the_contact = CONTACTS[data[0]]
 
@@ -206,8 +241,8 @@ def remove_phone_handler(data):
             return "Phone number has been removed."
         else:
             return "Phone number has not been removed."
-        
-        
+
+
 @input_error
 def new_phone_handler(data):
     new_phone = Phone(sanitize_phone_number(data[1]))
@@ -230,15 +265,17 @@ def find_handler(data):
     else:
         return "Contact not found."
 
+
 def bd_search(data):
     if found := CONTACTS.search_bd(data[0]):
         return found
+
 
 @input_error
 def show_all_handler(data=None):
     if len(CONTACTS) == 0:
         return "I do not have any contacts yet."
-    
+
     if data:
         items_per_page = int(data[0])
         all_items = list(CONTACTS.iterator(items_per_page))
@@ -359,15 +396,15 @@ def main():
             print()
             exit_handler()
             exit()
-        
+
         if command_with_args:
             command_parts = command_with_args.split(' ')
-            
+
             command = None
             data = None
             for i, _ in enumerate(command_parts):
-                if (command := ' '.join(command_parts[:i+1])) in list(COMMANDS.keys()):
-                    data = command_parts[i+1:]
+                if (command := ' '.join(command_parts[:i + 1])) in list(COMMANDS.keys()):
+                    data = command_parts[i + 1:]
                     break
 
             handler_result = call_handler((command, data))

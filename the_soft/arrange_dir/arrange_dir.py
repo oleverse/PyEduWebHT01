@@ -4,6 +4,12 @@ from os import listdir, rename, rmdir
 from pathlib import Path
 import shutil
 from prettytable import PrettyTable
+from the_soft.abstract.application import AppComponent
+
+
+class ArrangeDir(AppComponent):
+    def launch(self):
+        pass
 
 
 PATH = '/tmp'
@@ -11,13 +17,13 @@ list_type_r = set()
 list_type_files = dict(zip(['images', 'video', 'archives', 'documents', 'audio', 'others_file'],
                            [set(), set(), set(), set(), set(), set(), set()]))
 dict_arrange = dict(zip(['images', 'video', 'archives', 'documents', 'audio', 'others_file'],
-                            [('JPEG', 'PNG', 'JPG', 'SVG'),
-                             ('AVI', 'MP4', 'MOV', 'MKV'),
-                             ('ZIP', 'GZ', 'TAR'),
-                             ('DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'),
-                             ('MP3', 'OGG', 'WAV', 'AMR'),
-                             set()
-                             ]))
+                        [('JPEG', 'PNG', 'JPG', 'SVG'),
+                         ('AVI', 'MP4', 'MOV', 'MKV'),
+                         ('ZIP', 'GZ', 'TAR'),
+                         ('DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'),
+                         ('MP3', 'OGG', 'WAV', 'AMR'),
+                         set()
+                         ]))
 CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
 TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k",
                "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "ts",

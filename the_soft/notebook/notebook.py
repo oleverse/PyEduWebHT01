@@ -4,6 +4,7 @@ import os
 import re
 from math import ceil
 from typing import List
+from the_soft.abstract.view import View
 
 
 # батьківський клас у якому прописані __init__, @property, @setter,

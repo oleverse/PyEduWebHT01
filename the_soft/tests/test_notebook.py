@@ -1,7 +1,7 @@
 import time
-from the_soft.notebook.main_note import *
+from the_soft.notebook.notebook_bot import *
 
-from the_soft.notebook.notebook_classes import *
+from the_soft.notebook.notebook import *
 from random import sample, randint
 
 some_data = """
