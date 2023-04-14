@@ -23,8 +23,8 @@ def get_test_notebook():
         # for title take from 3 to 7 samples of strings
         title = ' '.join(sample([d for d in some_data.split()], randint(3, 7)))
         # content is a bit longer
-        content = content_format(' '.join(sample([d for d in some_data.split()],
-                                  randint(10, len(some_data.split()) - 1))))
+        content = NotebookBot.content_format(' '.join(sample([d for d in some_data.split()],
+                                             randint(10, len(some_data.split()) - 1))))
         notebook.add_note(Note(Title(title), Content(content)))
 
     return notebook
@@ -73,7 +73,7 @@ elif choice == 2:
     print(notebook.get_by_tag(Tag("bomba"), False))
     print(notebook.search("Relationships Date", False))
     print(notebook.search_by_id(77))
-    notebook.save_to_file()
+    notebook.serialize()
 elif choice == 3:
     for page_n, page in enumerate(get_test_notebook().search("Relationships Date")):
         print(f"================ PAGE: {page_n} =================\n")
