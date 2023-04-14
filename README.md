@@ -4,9 +4,6 @@ This is the Sophisticated Organizer For Thoughtful people
 
 It consists of three components:
         
-        Arrange Dir  - if you have some directory with a bunch of unsorted files this tool is for you.
-                       It helps to tidy up the specified directory and normalize some names.
-
         Notebook     - as its name says it's a container for your notes which is very useful if you
                        like using CLI while working or doing your usual stuff.
                        You can create notes, tag them, search through the collection delete and overwrite
@@ -17,15 +14,6 @@ It consists of three components:
                        "search bthd"
 
 All the components can be called from the Main Menu which you can see right after The S.O.F.T. starts
-
-Arrange Dir:
-        
-        If you choose this component it will ask you for a path to a directory which
-        you want to arrange.
-        The files in the directory will be grouped by type, names will be normalized by
-        stripping umbigious characters and transliterated if letters are not in ASCII range.
-        Empty directories will be removed.
-        The tool recognizes images, documents, unpacks archives etc
 
 Notebook available commands:
         
