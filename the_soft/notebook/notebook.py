@@ -4,7 +4,8 @@ import os
 import re
 from math import ceil
 from typing import List
-from the_soft.abstract.view import View
+from the_soft.abstract.serializable_collection import SerializableCollection
+from the_soft.base_bot.base_bot import Item
 
 
 # батьківський клас у якому прописані __init__, @property, @setter,
@@ -24,11 +25,12 @@ class Content(Field):  # основний зміст нотатки
         super().__init__(value)
 
 
-class Note: 
+class Note(Item):
     def __init__(self, title: Title, content: Content):
         self.title = title 
-        self.content = content 
+        self.content = content
         self.id = 0
+        super().__init__(self.id)
 
     def __str__(self):
         return (f"ID: {self.id}\n"
@@ -47,13 +49,13 @@ class Tag(Field):  # тег
         self.notes.append(note.id)
 
 
-class NoteBook(UserDict):  # контейнер для нотаток
+class NoteBook(UserDict, SerializableCollection):  # контейнер для нотаток
     
     def __init__(self, init_list: List[Note] = None):
         init_dict = {n.id: n for n in init_list} if init_list else None
         super().__init__(init_dict)
         self.__max_note_id = self.__get_max_note_id()
-        self.tags: dict[str, Tag] = {}
+        self.tags = {}
         self.__address_db_file = "note_book_data.dat"
         self.per_page = 3
 
@@ -90,6 +92,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
         self.__max_note_id += 1
         note.id = self.__max_note_id
         self.data[note.id] = note
+        return True
 
     def del_note(self, note_id):  # видаляє нотатки по id
         self.data.pop(note_id)
@@ -98,6 +101,7 @@ class NoteBook(UserDict):  # контейнер для нотаток
     def overwrite_note(self, note_id: int, new_note: Note):
         new_note.id = note_id
         self.data[note_id] = new_note
+        return True
    
     def add_tag(self, tag: Tag, note_id=None):
         if note_id is not None and note_id > 0:
@@ -159,28 +163,32 @@ class NoteBook(UserDict):  # контейнер для нотаток
             return self
         return self.__paginate(list(self.data.values()))
 
-    def save_to_file(self):  # зберігає у файлі
-        with open(self.__address_db_file, "wb") as file:
+    def serialize(self, to_file: str = None) -> bool:
+        dst_file = to_file or self.__address_db_file
+
+        with open(dst_file, "wb") as file:
             if file.writable():
                 picle_prepared_data = {
                     "data": self.data,
                     "__max_note_id": self.__max_note_id,
                     "tags": self.tags,
                     "per_page": self.per_page,
-                    "__address_db_file": self.__address_db_file
+                    "__address_db_file": dst_file
                 }
                 pickle.dump(picle_prepared_data, file)
             else:
-                print(f"Cannot save to {self.__address_db_file} file!")
+                print(f"Cannot save to {dst_file} file!")
                 return False
         return True
 
-    def load_from_file(self):  # завантажує з файлу
-        if not os.path.isfile(self.__address_db_file):
-            print("Database file was not found!")
+    def deserialize(self, from_file: str = None) -> bool:
+        source_file = from_file or self.__address_db_file
+
+        if not os.path.isfile(source_file):
+            print(f"{self.__class__.__name__}: Database file {source_file} was not found!")
             return False
 
-        with open(self.__address_db_file, 'rb') as file:
+        with open(source_file, 'rb') as file:
             if file.readable():
                 restored_data = pickle.load(file)
                 self.data = restored_data["data"]
@@ -189,6 +197,6 @@ class NoteBook(UserDict):  # контейнер для нотаток
                 self.per_page = restored_data["per_page"]
                 self.__address_db_file = restored_data["__address_db_file"]
             else:
-                print(f"Cannot read from {self.__address_db_file} file!")
+                print(f"{self.__class__.__name__}: Cannot read from {source_file} file!")
                 return False
         return True

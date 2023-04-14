@@ -4,13 +4,16 @@ from the_soft.abstract.view import View
 
 
 class Item(View):
+    def __init__(self, p_key_value):
+        self.p_key = p_key_value
+
     def render(self):
         print(str(self))
 
 
 class Bot(ABC):
     @abstractmethod
-    def get_help(self, short=True) -> None:
+    def get_help(self) -> None:
         pass
 
     @abstractmethod
@@ -18,11 +21,11 @@ class Bot(ABC):
         pass
 
     @abstractmethod
-    def remove_item(self, item: Item) -> bool:
+    def remove_item(self, item_p_key: Any) -> bool:
         pass
 
     @abstractmethod
-    def update_item(self, item: Item, new_item: Item) -> bool:
+    def edit_item(self, item_p_key: Any) -> bool:
         pass
 
     @abstractmethod
@@ -34,5 +37,5 @@ class Bot(ABC):
         pass
 
     @abstractmethod
-    def execute_command(self, command: str) -> Any:
+    def show_all(self):
         pass

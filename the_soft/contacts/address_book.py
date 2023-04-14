@@ -4,6 +4,8 @@ from pickle import dump, load
 import re
 import os
 from math import ceil
+from the_soft.abstract.serializable_collection import SerializableCollection
+from the_soft.base_bot.base_bot import Item
 
 
 class Field:
@@ -15,6 +17,10 @@ class Field:
         self._required = required
         self._multi_field = multi_field
         self._value = value
+
+    @property
+    def value(self) -> str:
+        return self._value
 
 
 class Name(Field):
@@ -39,11 +45,12 @@ class Phone(Field):
         super().__init__(multi_field=True)
         self.value = value
 
-    def __sanitize_phone_number(self, phone):
+    @staticmethod
+    def __sanitize_phone_number(phone):
         ptrn = re.compile(r"[+)(.\- ]")
         new_phone = re.sub(pattern=ptrn, repl="", string=phone)
 
-        if (new_phone != phone):
+        if new_phone != phone:
             print(f'Phone number has been sanitized to "{new_phone}"')
 
         return new_phone
@@ -82,6 +89,7 @@ class Phone(Field):
 
 class Birthday(Field):
     def __init__(self, value: str) -> None:
+        super().__init__(multi_field=True)
         self.value = value
 
     @property
@@ -96,19 +104,30 @@ class Birthday(Field):
             print('Bad date format, should be "%Y-%m-%d" like "2000-01-01"')
             self._value = None
 
-class Email(Field):
 
+class Email(Field):
     def __init__(self, value: str) -> None:
-        self.value = value
+        super().__init__(value=value, multi_field=True)
+
+    @property
+    def value(self):
+        return self._value
+
 
 class AddressHome(Field):
     def __init__(self, value: str) -> None:
-        self.value = value
+        super().__init__(value=value, multi_field=True)
 
-class Record:
+    @property
+    def value(self):
+        return self._value
+
+
+class Record(Item):
     def __init__(self, name, phone=None,
                  birthday=None, email=None, address_home=None) -> None:
         self.name = name
+        super().__init__(name.value)
         self.phones = []
         self.birthday = birthday
         self.email = email
@@ -173,19 +192,21 @@ class Record:
         return False
 
     def del_phone(self, phone: Phone) -> bool:
-        if (index := self.__find_phone(phone)) != None:
+        if (index := self.__find_phone(phone)) is not None:
             self.phones.remove(self.phones[index])
             return True
         return False
 
     def edit_phone(self, current_value: Phone, new_value: Phone) -> bool:
-        if (index := self.__find_phone(current_value)) != None:
+        if (index := self.__find_phone(current_value)) is not None:
             self.phones[index].value = new_value.value
             return True
         return False
 
 
-class AddressBook(UserDict):
+class AddressBook(UserDict, SerializableCollection):
+    __with_init_dict = False
+
     def __init__(self, init_dict=None, db_file_path=None):
         self.__address_db_file = db_file_path or "address_book.dat"
 
@@ -199,24 +220,6 @@ class AddressBook(UserDict):
 
     def __str__(self) -> str:
         return '\n'.join([f"{self.data[name]}" for name in self.data])
-    
-    def __setitem__(self, key, item) -> None:
-        if not self.__with_init_dict:
-            print("Use method add_record()!")
-            self.__with_init_dict = False
-        else:
-            return super().__setitem__(key, item)
-    
-    def add_record(self, record: Record):
-        if record and type(record) == Record:
-            if self.__record_exists(record.name.value):
-                return False
-            else:
-                self.data[record.name.value] = record
-                return True
-        else:
-            print("Bad record type, should be Record()")
-            return False
 
     def search_bd(self, days: str):
         if not days.isdecimal():
@@ -225,26 +228,19 @@ class AddressBook(UserDict):
         for key in self.data:
             bday = self.data[key].days_to_birthday()
             if bday is not None and bday <= int(days):
-                found1.add_record(self.data[key])
+                found1[key] = self.data[key]
 
         return found1 if len(found1.data) else None
 
     def search(self, pattern: str):
         found = AddressBook()
         for name, record in self.data.items():
-            if re.match(f".*{pattern}.*", name):
+            aggregated = ''.join([(f.value if isinstance(f, Field) else '')
+                                  for f in (record.name, record.address_home, record.email)])
+            aggregated += ''.join([(p.value if isinstance(p, Field) else '') for p in record.phones])
+            if re.match(f".*{pattern}.*", aggregated, re.I):
                 if isinstance(record, Record):
-                    found.add_record(record)
-
-
-            else:
-                for phone in record.phones:
-                    if re.match(f".*{pattern}.*", phone.value, re.IGNORECASE):
-                        if isinstance(record, Record):
-                            found.add_record(record)
-
-
-
+                    found[record.p_key] = record
 
         return found if len(found.data) else None
 
@@ -261,26 +257,29 @@ class AddressBook(UserDict):
             yield AddressBook(list(self.data.items())[ci:ci + records_number])
             ci += records_number
 
-    def serialize(self) -> bool:
-        with open(self.__address_db_file, 'wb') as db_file_fh:
+    def serialize(self, to_file: str = None) -> bool:
+        dst_file = to_file or self.__address_db_file
+
+        with open(dst_file, 'wb') as db_file_fh:
             if db_file_fh.writable():
                 dump(self.data, db_file_fh)
             else:
-                print(f"Cannot write to {self.__address_db_file} file!",
+                print(f"Cannot write to {dst_file} file!",
                       "Serialization is impossible!")
                 return False
         return True
     
-    def deserialize(self) -> bool:
-        if not os.path.isfile(self.__address_db_file):
-            print("Database file was not found!")
+    def deserialize(self, from_file: str = None) -> bool:
+        source_file = from_file or self.__address_db_file
+
+        if not os.path.isfile(source_file):
+            print(f"{self.__class__.__name__}: Database file {source_file} was not found!")
             return False
         
-        with open(self.__address_db_file, 'rb') as db_file_fh:
+        with open(source_file, 'rb') as db_file_fh:
             if db_file_fh.readable():
                 self.data = load(db_file_fh)
             else:
-                print(f"Cannot read from {self.__address_db_file} file!",
-                      "Deserialization is impossible!")
+                print(f"{self.__class__.__name__}: Cannot read from {source_file} file!")
                 return False
         return True
