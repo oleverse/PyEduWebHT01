@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+prompt-toolkit = "==3.0.38"
+pyfiglet = "==0.8.post1"
+wcwidth = "==0.2.6"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
